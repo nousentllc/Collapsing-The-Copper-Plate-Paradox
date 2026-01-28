@@ -1,0 +1,2068 @@
+\documentclass[11pt]{article}
+
+% -------------------- 1. Core Formatting & Fonts --------------------
+\usepackage[margin=0.75in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+
+\onehalfspacing
+
+% -------------------- 2. Headers & Footers --------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % Clear all default header/footer fields
+
+% --- Header Definitions ---
+\fancyhead[L]{\small \textit{Collapsing the Copper-Plate Paradox}} % Left Header: Short Title
+\fancyhead[R]{\small Candler}                                    % Right Header: Author Name
+\renewcommand{\headrulewidth}{0.4pt}                             % Thin line under header
+
+% --- Footer Definitions ---
+\fancyfoot[C]{\thepage}                                          % Center Footer: Page Number
+\renewcommand{\footrulewidth}{0pt}                               % No line above footer
+
+% Ensure the title page (which uses 'plain' style) also follows our footer rules
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% -------------------- 3. Math & Science --------------------
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{siunitx}
+\sisetup{
+    detect-all=true,
+    group-separator={,},
+    group-minimum-digits=4
+}
+
+% -------------------- 4. Tables, Figures & Lists --------------------
+\usepackage{booktabs,multirow,tabularx}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage[numbers,sort&compress]{natbib}
+
+% -------------------- 5. Listings (Modernized) --------------------
+\usepackage{listings}
+
+\lstdefinestyle{annexpseudo}{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{black!30},
+  backgroundcolor=\color{black!3},
+  tabsize=2,
+  keepspaces=true,
+  upquote=true,
+  mathescape=true,
+  commentstyle=\color{green!50!black}\itshape,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  % Map Unicode chars to LaTeX equivalents automatically
+  literate=
+    {←}{$\leftarrow$}{2}
+    {→}{$\to$}{2}
+    {∝}{$\propto$}{2}
+    {≤}{$\le$}{2}
+    {≥}{$\ge$}{2}
+    {∑}{$\sum$}{2}
+    {Δ}{$\Delta$}{2}
+    {α}{$\alpha$}{1}
+    {β}{$\beta$}{1}
+    {γ}{$\gamma$}{1}
+    {ω}{$\omega$}{1}
+    {μ}{$\mu$}{1}
+    {ν}{$\nu$}{1}
+    {π}{$\pi$}{1}
+    {ℓ}{$\ell$}{1}
+    {×}{$\times$}{2}
+}
+
+% Aliases
+\lstdefinestyle{annexe}{style=annexpseudo}
+\lstdefinestyle{annexcode}{style=annexpseudo}
+
+% -------------------- 6. Hyperlinks & Refs --------------------
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=blue!60!black,
+  urlcolor=blue!60!black,
+  breaklinks=true
+}
+
+\usepackage[capitalize,nameinlink]{cleveref}
+
+% -------------------- 7. Custom Macros & Symbols --------------------
+\usepackage{xparse}
+\newcommand{\annexsection}[1]{\section{Annex \thesection{} — #1}}
+
+% -- Plain Symbols --
+\newcommand{\ELCC}{\ensuremath{\mathrm{ELCC}}}
+\newcommand{\VOLL}{\ensuremath{\mathrm{VOLL}}}
+\newcommand{\EUE}{\ensuremath{\mathrm{EUE}}}
+\newcommand{\LOLE}{\ensuremath{\mathrm{LOLE}}}
+\newcommand{\ASCDE}{\ensuremath{\mathrm{ASCDE}}}
+\newcommand{\MRV}{\ensuremath{\mathrm{MRV}}}
+\newcommand{\MC}{\ensuremath{\mathrm{MC}}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\cvar}{\mathrm{CVaR}}
+\newcommand{\kpp}{\;\mathrm{pp}}
+
+% -- Flexible Macros --
+\NewDocumentCommand{\sym}{m o o}{%
+  \ensuremath{%
+    #1%
+    \IfNoValueTF{#3}{}{^{\mathrm{#3}}}%
+    \IfNoValueTF{#2}{}{_{#2}}%
+  }%
+}
+
+\NewDocumentCommand{\MWdel}{ o o }{%
+  \ensuremath{%
+    \mathrm{MW}^{\mathrm{del}\IfNoValueTF{#2}{}{,\,#2}}%
+    \IfNoValueTF{#1}{}{_{#1}}%
+  }%
+}
+
+\NewDocumentCommand{\Dpoi}{ o o }{%
+  \ensuremath{%
+    D^{\mathrm{POI}\IfNoValueTF{#2}{}{,\,#2}}%
+    \IfNoValueTF{#1}{}{_{#1}}%
+  }%
+}
+\NewDocumentCommand{\Ddel}{ o o }{\Dpoi[#1][#2]}
+
+% -------------------- 8. Theorem Environments --------------------
+\numberwithin{equation}{section}
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+
+% -------------------- 10. Metadata --------------------
+\title{Collapsing the Copper-Plate Paradox:\\
+UEVF/ASCDE and an OPF-Consistent Fix for MISO's Two-Tier PRA Signals}
+\author{Justin Candler\thanks{Contact: \texttt{Nousentllc@gmail.com}}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Regional capacity markets often convey apparently contradictory signals: ``adequate in aggregate'' at the Systemwide level while simultaneously ``short and expensive'' locally once transfer limits bite. In MISO's seasonal Planning Resource Auction (PRA), this arises from co-optimizing a Systemwide Reliability-Based Demand Curve (RBDC) that behaves like a copper plate together with Subregional RBDCs that enforce intraregional transfer constraints. This paper presents a system-aware valuation and sequencing framework---UEVF/ASCDE with an OPF-consistent marginal reliability value (MRV) field---that collapses the paradox by valuing only \emph{deliverable, ELCC-accredited} capacity where constraints bind. We formalize two market-design fixes: (A) condition the Systemwide curve on deliverability (feasible sum of subregional increments), and (B) retire the Systemwide curve and clear on Subregional curves only while reporting the system shadow value of the transfer envelope. An ARQ ``fast-lane'' ranking aligns interconnection sequencing with reliability relief at minimum upgrade cost. We include an implementation guide for LRZ-7 (Michigan) and a QA/reproducibility annex suitable for regulatory dockets and operator adoption.
+\end{abstract}
+
+\noindent\textbf{Keywords:} Resource Adequacy, ELCC, OPF, PRA, MRV, Deliverability, Transmission Constraints, Interconnection Queue.
+
+\newpage
+
+\section{Introduction and Motivation}
+Capacity markets must translate physics into prices. In the MISO PRA, a Systemwide RBDC is co-optimized with Subregional RBDCs. The former implicitly treats the footprint as a highly transferable region (a ``copper sheet''), while the latter enforces subregional transfer limits and local requirements. The result can resemble a Schrödinger vignette: the system looks ``alive'' (adequate) in aggregate while a local cat is ``dead'' (short) behind binding constraints. The issue is not quantum; it is a design mismatch between a \emph{valuation surface} that presumes frictionless transfers and a \emph{feasibility surface} that does not.
+
+This paper operationalizes a fix already embedded in the Unified Energy Valuation Framework (UEVF): compute a local, OPF-consistent marginal reliability value (MRV) per zone/POI and season, price dependable energy with the system-aware cost of dependable energy (\ASCDE), and sequence interconnections with an ARQ fast-lane tied to reliability relief, deliverability and upgrade cost. We then show how these same constructs can be lifted into PRA clearing logic with minimal surgery.
+
+% ---------- Notation & Symbols ----------
+\section{Notation and Symbols}
+\label{sec:notation}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\textwidth}{@{} l X @{}}
+\toprule
+\(\ELCC\) & Effective Load Carrying Capability (seasonal, resource- and zone-specific).\\
+\(\VOLL\) & Value of Lost Load (baseline \SI{20000}{\$/MWh}, with \(\pm 15\%\) sensitivity).\\
+\(\EUE_z\) & Expected Unserved Energy in zone \(z\) (seasonal model, multi-year weather).\\
+\(\MWdel_z\) & Deliverable MW in zone \(z\): \(\MWdel_z=\ELCC_{z,\text{season}}\cdot \Ddel \cdot \mathrm{MW}_{\text{nameplate}}\).\\
+\(\Ddel\) & Deliverability factor at POI (import limits, voltage/thermal/reactive, explicit de-rates).\\
+\(\MRV_z\) & Marginal Reliability Value: \(\MRV_z = -\,\VOLL\cdot \partial \EUE_z/\partial \MWdel_z\).\\
+\(\ASCDE\) & System-aware cost of dependable energy (Eq.\,(1)).\\
+\(\MC\) & Marginal cost (all-in, consistent with \ASCDE).\\
+\(\mathcal{D}\) & Feasible deliverability polytope in DC-OPF space: \(\mathcal D=\{x: A x\le b\}\).\\
+\(\mathrm{PTDF}\) & Power Transfer Distribution Factors; \(\mathrm{LODF}\) line-outage factors.\\
+\bottomrule
+\end{tabularx}
+
+\section{Background: Two-Tier PRA Signals \& Copper-Plate Heuristic}
+RA constructs traditionally simplify transfers with a copper-plate assumption, then \emph{partially} restore physics via load pockets, import limits, and zonal LCR/CIL. In MISO's PRA, the Systemwide RBDC continues to value capacity as if it were readily transferable, while Subregional RBDCs (North/Central and South) enforce intraregional limits. This split can generate cross-level tension: system prices suggest adequacy; subregional prices reflect scarcity. We target this \emph{signal incoherence} directly.
+
+\section{Design Objective and Valuation Principle}
+The core objective is to ensure that the \emph{marginal value signal} and the \emph{physical feasibility} describe the same reality. That requires:
+\begin{enumerate}[leftmargin=1.2em]
+\item Local valuation at the binding place and season, not an RTO-wide ideal.
+\item Deliverability-aware accreditation: only \emph{ELCC-weighted, deliverable} MW count.
+\item A decision rule that clears additions while marginal cost is below local marginal reliability value.
+\end{enumerate}
+
+\section{UEVF/ASCDE: Definitions and Decision Rules}
+\subsection{ASCDE---system-aware cost of dependable energy}
+We price dependable energy with:
+\begin{equation}
+\ASCDE = \frac{\mathrm{Capex}+\mathrm{FOM}+\mathrm{VOM/Fuel}+\mathrm{Tx}+\mathrm{Storage}+\mathrm{RA}-\mathrm{Market\ Value}}{\text{Reliable MWh}},
+\end{equation}
+where the reliability adder is
+\begin{equation}
+\mathrm{RA} = \left(\frac{\EUE}{\text{Annual Load}}\right)\VOLL,
+\end{equation}
+and \emph{Reliable MWh} is the \emph{ELCC-weighted, deliverable} energy over the accreditation horizon. This forces apples-to-apples comparison on dependable output.
+
+\subsection{Local marginal reliability value (MRV)}
+Let $z$ index a subregion/zone and $\MWdel$ be deliverable MW:
+\begin{equation}
+\MWdel = \ELCC_{z,\text{season}}\;\Ddel\;\mathrm{MW}_{\text{nameplate}}, \quad \Ddel\in(0,1],
+\end{equation}
+with $\Ddel$ encoding POI thermal/voltage/reactive limits and explicit de-rates. The local MRV is
+\begin{equation}
+\boxed{\MRV_z = -\,\VOLL \cdot \frac{\partial \EUE_z}{\partial \MWdel}}, 
+\label{eq:MRV}
+\end{equation}
+computed from a seasonal LOLE/EUE model using multiple weather years (Sec.~\ref{sec:opf-ensemble}). The \emph{decision rule} is:
+\begin{equation}
+\textbf{Add/contract while}\quad \MC \le \MRV_z,
+\end{equation}
+with published sensitivities $\VOLL \pm 15\%$ and $\ELCC \pm 20\%$.
+
+\subsection{Seasonal ELCC and deliverability discipline}
+We use seasonal $\ELCC$ and enforce deliverability via $\Ddel$. Non-deliverable MW are down-weighted (or excluded from RA counting). Planning reserve mapping and any non-deliverable counting rules are disclosed in the annex.
+
+\section{OPF-Consistent Ensemble for MRV}
+\label{sec:opf-ensemble}
+Valuation should sit on physics. We proceed as follows:
+\begin{enumerate}[leftmargin=1.2em]
+\item \textbf{AC-OPF baselines:} build seasonal AC-OPF baselines (summer/winter and shoulder variants) to capture voltages, reactive margins, and binding sets.
+\item \textbf{Sparse DC linearizations:} around each baseline, construct linear DC-OPF surrogates (PTDF/LODF) for tractable ensemble evaluation.
+\item \textbf{Scenario ensemble:} sample $\omega=1,\dots,K$ over weather years ($\geq 7$), load shapes, generator FORs, and interconnection states.
+\item \textbf{Deliverability \& MRV:} for each candidate and $z$, compute
+$\MWdel[z][(\omega)]$, the induced $\Delta \EUE_{z}^{(\omega)}$, and hence
+$\MRV_{z}^{(\omega)}$ via \eqref{eq:MRV}; aggregate to $\MRV_{z}$ with
+P10/P50/P90 bands.
+
+\[
+\MRV_{z}
+= \mathbb{E}_{\omega}\!\left[
+  -\,\VOLL\,
+  \frac{\partial \EUE_{z}^{(\omega)}}{\partial \MWdel[z][(\omega)]}
+\right].
+\]
+\end{enumerate}
+Formally, with seeded exogenous draws,
+\begin{equation}
+  s_{t+1}^{(\omega)} = F\!\bigl(s_t^{(\omega)},\,u_t\bigr),
+  \qquad
+  \MRV_{z}
+  = \mathbb{E}_{\omega}\!\left[
+      -\,\VOLL\,
+      \left.\frac{\partial \EUE_{z}}{\partial \mathrm{MW}^{\mathrm{del}}}\right|_{(\omega)}
+    \right].
+\end{equation}
+
+\section{ARQ ``Fast-Lane'' for Interconnection Sequencing}
+We rank projects by a reliability-first score:
+\begin{equation}
+\text{Score}
+= w_1\cdot \underbrace{\text{Reliability Lift}}_{\ELCC \times D^{\mathrm{POI}} \times (-\Delta\LOLE/\Delta \mathrm{MW})}
++ w_2\cdot \underbrace{\text{Survival}}_{\text{COD P50/P90}}
++ w_3\cdot \underbrace{\text{Deliverability}}_{D^{\mathrm{POI}}}
+- w_4\cdot \underbrace{\text{Upgrade } \$/\mathrm{MW}}_{\text{cluster/restudy}}\,.
+\end{equation}
+with $w_1\ge w_2\ge w_3$ and $w_4>0$. The first MW in are those that relieve binding risk at lowest delivered cost and credible COD.
+
+\section{PRA Integration: Two Concrete Fixes}
+\subsection{Fix A: Deliverability-conditioned Systemwide curve (minimal surgery)}
+Retain a Systemwide RBDC but condition it on feasibility. For any price $p$, distribute the incremental system quantity across subregions $\{q_z(p)\}$ subject to:
+\begin{align}
+q_z(p) &\le Q^{\text{SR}}_z(p)\quad \text{(subregional curve bounds)},\\
+Aq &\le b \quad \text{(SRIC/SREC + Energy Transfer Constraint)},\\
+q_z(p) &\text{ in \emph{deliverable ELCC MW}}.
+\end{align}
+Set $Q^{\text{del}}_{\text{SYS}}(p)=\sum_z q_z(p)$ and use $Q^{\text{del}}_{\text{SYS}}$ in place of the copper-plate system quantity. The system curve now collapses to the binding geography by construction.
+
+\subsection{Fix B: Subregional-only clearing with system shadow value (structural clarity)}
+Retire the Systemwide curve. Clear on Subregional RBDCs with SRIC/SREC + the transfer envelope. Report the system price as the \emph{shadow value} of the transfer constraints. One physics; transparent constraint reporting.
+
+\section{Implementation Guide: LRZ-7 (Michigan)}
+\textbf{Inputs:} seasonal AC-OPF baselines, PTDF/LODF matrices; seasonal $\ELCC_{z}$ by resource; $\Ddel$ per POI; upgrade cost bands; VOLL baseline \SI{20000}{\$}/MWh; weather years $\ge 7$; baseline $\EUE,\LOLE$.
+
+\textbf{Run:} compute $\MRV_z$ maps (summer/winter), \ASCDE, Net \$ per RA-MW, and RA-MW/\$B (P10/P50/P90). Rank ARQ; identify which constraint bound (import limit, $\Ddel<1$, LCR/CIL, POI de-rate). Tie COD bands to MTEP in-service and affected-system outcomes.
+
+\textbf{Outputs:} (i) MC vs MRV by zone/season, (ii) fast-lane list with Survival (COD P50/P90), Deliverability, Upgrade \$/MW, (iii) sensitivity tables (VOLL $\pm$15\%, ELCC $\pm$20\%), (iv) lineage and QA stamps (Annex~E).
+
+% ---------- Local welfare optimality ----------
+\section{Local Welfare Optimality of the \texorpdfstring{\(\MC\le\MRV_z\)}{MC<=MRV} Rule}
+\label{sec:welfare-optimality}
+
+\newtheorem{prop}{Proposition}
+\begin{prop}
+Assume (i) \(\EUE_z(\MWdel_z)\) is differentiable and nonincreasing in \(\MWdel_z\), 
+(ii) \(\EUE_z\) is convex in \(\MWdel_z\) over the relevant range,\footnote{Empirically, convexity holds for standard adequacy simulators once deliverability is respected; if nonconvex due to discrete unit effects, the result applies to the convex envelope.}
+and (iii) additions are small relative to network nonlinearity so \(\Ddel\) is locally constant.
+Then the decision rule \(\MC \le \MRV_z\) is necessary and sufficient for local social‑welfare improvement, where welfare is measured as
+\[
+W(\MWdel_z)= -\,\VOLL\cdot \EUE_z(\MWdel_z) - C(\MWdel_z),
+\]
+with \(C'(\MWdel_z)=\MC\).
+\end{prop}
+
+\paragraph{Proof sketch.}
+By (i)–(ii), \(W\) is concave in \(\MWdel_z\). Then
+\(
+\frac{dW}{d\MWdel_z}
+= -\,\VOLL\,\frac{\partial \EUE_z}{\partial \MWdel_z} - \MC
+= \MRV_z - \MC.
+\)
+The first‑order condition for local optimality is \(\MRV_z-\MC\ge 0\), i.e.\ \(\MC\le \MRV_z\). Sufficiency follows from concavity.
+\qed
+
+\section{Sensitivity, Scenario Levers, and Threshold Alerts}
+Default levers: VOLL; ELCC bands; deliverability stress $\Ddel \times \{0.85,0.7\}$; upgrade cap (\$/MW $\le X$); storage arbitrage uplift $\kappa$; IRP counting toggles; weather-year subsets. Report distribution bands and raise a threshold alert when $>$10\% of Monte Carlo runs breach: $\LOLE>0.1$ d/yr, network utilization $>100\%$, or negative Net \$/RA-MW.
+
+\section{Verification, QA, and Reproducibility (Annex E summary)}
+Stamp headers with \emph{As of: YYYY-MM-DD (America/Detroit)} and \emph{Recency\_Risk}. Run anomaly/consistency pass (duplicates, unit mismatches, outliers). Record source licensing; redact PII and contract-confidential rates. Mark stale/refresh triggers (new ISO postings, tariff/docket updates, queue/COD changes, age $>90$ days). Include a reproducibility capsule: code hash, dataset checksums, seeds, environment summary, and figure recipes.
+
+
+\section{Quantum–Lensed Operational Overlay for UEVF/ASCDE + ARQ}
+\label{sec:quantum-overlay}
+
+\subsection*{Executive summary}
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{Two-layer architecture:} treat the grid/queue/transmission \emph{substrate} as (nearly) deterministic OPF dynamics (’t~Hooft/CAI instinct), and the \emph{operational layer} (forecasts, studies, auctions) as probabilistic measurement with Bayesian state updates (Copenhagen instinct).
+  \item \textbf{Local, OPF-consistent value:} compute a zonal, seasonal marginal reliability surface
+  \[
+    \MRV_{z} = -\,\VOLL \,\frac{\partial \EUE_{z}}{\partial \MWdel_{z}}
+  \]
+  from an ensemble OPF (AC baselines + sparse DC linearizations), not from a copper‑plate ideal.
+  \item \textbf{Policy-relevant “collapse”:} when a study/auction/outage returns a classical outcome, project the portfolio onto the feasible deliverability polytope and update the \(\MRV\) field; then re‑rank ARQ.
+  \item \textbf{Endogeneity guard:} control selection/measurement dependence (policy choices correlate with system states) via instrumentation or structural causal priors; publish an uncertainty ledger.
+  \item \textbf{Net effect:} one physics in the loop—deliverable, ELCC‑accredited MW at the binding place/season, cleared while \(\MC \le \MRV_{z}\); the rest is transparent inference and reproducible OPF numerics.
+\end{itemize}
+
+\subsection{Overlay architecture (concept to operations)}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.27\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth} X}
+\toprule
+\textbf{Quantum lens} & \textbf{UEVF analogue} & \textbf{What we do, concretely} \\
+\midrule
+Deterministic substrate (’t~Hooft CAI): ontic states evolve by a permutation
+&
+Grid micro‑state \(s_t=(G_t,T_t,L_t,Q_t)\) with deterministic step \(s_{t+1}=F(s_t,u_t)\) for fixed exogenous draws
+&
+Build \textbf{AC-OPF seasonal baselines}; linearize (PTDF/LODF) around each baseline; seed exogenous paths so the simulator is deterministic given a seed.\\
+\addlinespace
+Hilbert envelope / coarse‑graining
+&
+Ensemble surrogate
+&
+Use a \textbf{sparse ensemble} of DC-OPF linearizations \(\{U_k\}\) to approximate neighborhoods of AC baselines; this is the basis for fast \(\MRV\) and deliverability.\\
+\addlinespace
+Born rule / probabilities
+&
+Bayesian inference on \(\MRV\)
+&
+Maintain \(p(s_t\!\mid\!\mathcal I_t)\); compute \(\mathbb{E}[\MRV_{z}\!\mid\!\mathcal I_t]\) and P10/P50/P90 bands.\\
+\addlinespace
+Measurement \& collapse
+&
+Outcome‑driven projection
+&
+Upon outcome \(y_t\) (restudy/auction/outage), update \(p(s_t)\) and the feasible region \(\mathcal D_t\) (new \(\Ddel\), LCR/CIL/SRIC/SREC/ETC); project portfolio to \(\mathcal D_t\); re‑rank ARQ.\\
+\addlinespace
+Complementarity
+&
+Primal–dual OPF views
+&
+Use \textbf{primal} (flows/voltages) for feasibility and \(\Ddel\); use \textbf{dual} (shadow prices) to interpret \(\MRV\) and \ASCDE{} deltas; do not conflate in one metric.\\
+\bottomrule
+\end{tabularx}
+
+\subsection{Quantum-inspired regime weighting for SDDP}
+
+Let $r_t\in\{1,\dots,R\}$ be a Markov regime (weather–fuel–policy). Define nonclassical weights
+\[
+w_t(r) \;=\; \frac{\exp\!\big(-\gamma\,\mathcal{A}(r\!\to\!r_{t+1})\big)}{\sum_{r'}\exp\!\big(-\gamma\,\mathcal{A}(r'\!\to\!r_{t+1})\big)},
+\]
+where $\mathcal{A}$ is an “action” penalizing abrupt regime jumps (a discrete analog of a stochastic bridge) and $\gamma>0$ tunes coherence. The robust objective becomes
+\[
+\min_{\pi}\ \E\Big[\sum_{t}\delta^t\big(Q_t(s_t,\omega_t)+\mathrm{CapEx}_t(x_t)\big)\Big]
+\quad\text{subject to}\quad \omega_t\sim \sum_{r} w_t(r)\,\widehat{\mathbb{P}}(\cdot\mid r).
+\]
+Define a cost functional $J=\sum_{s} p_s\,\big(\mathrm{CVaR}_\alpha[\mathrm{EUE}_s] + \alpha_0\,\Delta_{\text{state},s}\big)$,
+where $\Delta_{\text{state},s}$ penalizes high-variance regime paths.
+
+\paragraph{Computation (pseudocode).}
+\begin{lstlisting}[style=annexpseudo,caption={Quantum-inspired regime reweighting},label={lst:qsd}]
+for t = 1..T:
+  compute regime weights w_t(r) \propto exp(-gamma A(r->r_{t+1}))
+  sample omega_t ~ mixture \sum_r w_t(r) P(.|r)
+  solve OPF recourse; record duals (pi_z, mu_l, nu)
+  update cost J_s = CVaR_alpha[EUE_s] + alpha0 * Delta_state,s
+backward: add cuts using usual beta from duals; intercept includes Delta_state penalty
+\end{lstlisting}
+Setting $\gamma\!\downarrow\!0$ recovers classical SDDP; $\gamma\!>\!0$ biases toward coherent regime paths, stabilizing tails (empirical knob, reported when executed).
+
+\subsection{Formal layer (minimal math)}
+\paragraph{(1) Substrate state and transitions.}
+Let the seeded, scenario‑indexed substrate be
+\[
+  s_t^{(\omega)}=\big(G_t^{(\omega)},\,T_t^{(\omega)},\,L_t^{(\omega)},\,Q_t^{(\omega)}\big),\qquad
+  s_{t+1}^{(\omega)} = F\!\left(s_t^{(\omega)}, u_t\right),
+\]
+with \(\omega\) fixing weather, outages, and interconnection realizations. Given \(\omega\), the OPF map is deterministic.
+
+\paragraph{(2) Deliverable MW and local MRV.}
+\[
+  \MWdel[z]\big|_{(\omega)}
+  \;=\;
+  \ELCC_{z,s}^{(\omega)} \cdot \Ddel\big|_{(\omega)} \cdot \mathrm{MW}_{\text{nameplate}},
+  \qquad
+  \boxed{%
+    \MRV_{z}^{(\omega)}
+    \;=\;
+    -\,\VOLL\,
+    \left.\frac{\partial \EUE_{z}}{\partial \MWdel[z]}\right|_{(\omega)}
+  },
+  \quad
+  \MRV_{z}
+  \;=\;
+  \mathbb{E}_{\omega}\!\left[\MRV_{z}^{(\omega)} \mid \mathcal{I}_{t}\right].
+\]
+\emph{Decision rule:} activate additions while $\MC_{z}\le \MRV_{z}$.
+
+\paragraph{(3) Pricing the right product (\ASCDE).}
+\[
+  \ASCDE=\frac{\mathrm{Capex}+\mathrm{FOM}+\mathrm{VOM/Fuel}+\mathrm{Tx}+\mathrm{Storage}
+  +\left(\frac{\EUE}{\mathrm{Load}}\right)\VOLL-\mathrm{Market\ Value}}
+  {\text{ELCC-weighted, deliverable MWh}}.
+\]
+
+\paragraph{(4) Outcome‑driven “collapse”.}
+When a classical outcome \(y_t\) arrives:
+\[
+  p(s_t\mid \mathcal I_t)\ \propto\ p(y_t\mid s_t)\,p(s_t\mid \mathcal I_{t-1}),\quad
+  \mathcal{D}_t=\{x: A_t x\le b_t\},\quad
+  \Pi_{\mathcal{D}_t}(\text{portfolio})\mapsto \text{feasible portfolio},
+\]
+then recompute \(\Ddel,\,\ELCC,\,\MRV_{z}\) and re‑rank ARQ.
+
+\subsection{Limitations and Mitigations}
+\label{sec:limits}
+
+\paragraph{L1. Quantum overlay is not fully operationalized (Sec. 13.3).}
+The regime–weighting overlay in Sec. 13.3 remains a methods prototype; it is not yet a production control in the planning stack. As such, conclusions drawn from it are qualitative and subject to change.
+
+\emph{Mitigation.} The core stack defaults to classical SDDP with the overlay disabled (control parameter $\gamma=0$). When enabled for experiments, we pre-register an ablation plan and report classical versus overlay deltas side-by-side:
+\begin{itemize}[leftmargin=1.2em]
+  \item Metrics: MRV maps, EUE and LOLE, Net \$/RA-MW, price-spread coherence on binding ties.
+  \item Protocol: identical scenarios, seeds, solver tolerances; only the overlay knob differs.
+  \item Acceptance gates (to be checked upon execution): overlay never degrades any reliability metric at P50; if any metric degrades beyond a configured tolerance, rollback to classical SDDP and file a change note.
+\end{itemize}
+
+\paragraph{L2. No formal contingency governance for novel features.}
+The manuscript lacks an explicit rollback and change-control procedure for experimental features (e.g., the quantum overlay or UC-lite scarcity proxy).
+
+\emph{Mitigation.} We adopt a simple governance capsule:
+\begin{itemize}[leftmargin=1.2em]
+  \item Gating: novel features run only under an experiment flag and never alter baseline results without passing acceptance gates in Annex E.
+  \item Rollback: a one-click switch to the classical configuration is maintained; any failure of acceptance gates triggers automatic rollback and a logged reason.
+  \item Change log: each experimental run appends seeds, solver settings, code commit, and a short decision note to a versioned log; production plots always point to the last stable commit.
+\end{itemize}
+
+\paragraph{L3. Planner demand for concrete MISO case studies.}
+To build operator trust, planners will expect ISO-specific demonstrations rather than generic examples.
+
+\emph{Mitigation.} We define three MISO-focused case modules to be executed as part of the validation protocol (no results asserted here):
+\begin{enumerate}[leftmargin=1.2em]
+  \item \textbf{LRZ-7 summer peak.} Seasonal MRV and EUE bands under historical weather; deliverability stress tests at $D\in\{1.00,0.85,0.70\}$.
+  \item \textbf{Binding intertie illustration.} Subregional-only clearing with a saturated transfer; demonstrate price–shadow identity and quantify shadow volatility under scenario variation.
+  \item \textbf{Queue relief triage.} ARQ ranking stability on a representative ERAS subset; show RA-MW per \$B and Net \$/RA-MW with P10/P50/P90.
+\end{enumerate}
+\emph{Execution notes.} Each module uses the Annex O and Annex T protocols (determinism, Wasserstein audit, holdout OOS checks). Outputs are created only upon execution; tables and figures are reserved placeholders until then.
+
+\paragraph{L4. External validity and generalization risk.}
+Methods calibrated for MISO may not transfer identically to PJM or CAISO without parameter adaptation.
+
+\emph{Mitigation.} Section 19 provides a cross-ISO mapping and a small parameter audit checklist (RA targets, deliverability tests, transfer management). Generalization claims will be made only after the corresponding Annex O runs are completed for each ISO.
+
+\paragraph{L5. Documentation maturity.}
+While Annex E formalizes QA and reproducibility, some practitioner materials (step-by-step runbook, troubleshooting guide) are abbreviated.
+
+\emph{Mitigation.} We will ship, upon execution, a short operator runbook: inputs and invariants, “first run” checklist, common failure modes, and acceptance-test interpretation. Provenance files (manifest, seeds, solver, environment hash) are always written at run time.
+
+\subsection*{Planned enhancements}
+\begin{itemize}[leftmargin=1.2em]
+  \item Complete the Sec. 13.3 overlay by adding a documented control knob, stability tests, and ablation figures; keep classical SDDP as the default until acceptance gates pass.
+  \item Execute the three MISO case modules under Annex O and Annex T; publish side-by-side classical versus overlay comparisons if and only if acceptance gates are met.
+  \item Add a contingency appendix with explicit rollback triggers and a single-page change-control form for experimental features.
+\end{itemize}
+
+\subsection*{Reader guidance}
+Until the validation protocol is executed, treat any overlay-related figures or tables as placeholders. All empirical statements in this draft are conditional and will be updated only after acceptance tests pass and provenance artifacts are archived.
+
+\subsection{Algorithmic overlay (fits OPF practice)}
+\begin{enumerate}[leftmargin=1.2em]
+  \item \textbf{Baselines:} AC‑OPF seasonal baselines (summer/winter; shoulder variants); extract sensitivities and binding sets.
+\item \textbf{Sparse ensemble:} generate $K$ scenarios $\omega_k$ (weather years, FOR draws, interconnection states).
+Around each baseline, build linearized DC surrogates; store $D^{\mathrm{POI}}\big|_{(\omega_k)}$, $\ELCC^{(\omega_k)}$, and the binding-constraint sets.
+\item \textbf{MRV \& \ASCDE{} field:} for each candidate and zone, compute
+$\mathrm{MW}^{\mathrm{del}}_{z}\big|_{(\omega_k)}$ and
+$\Delta \EUE_{z}\big|_{(\omega_k)}$, then
+$\MRV_{z}\big|_{(\omega_k)}$. Aggregate to $\MRV_{z}$ with P10/P50/P90;
+compute $\ASCDE$, Net \$ / RA\text{-}MW, and RA\text{-}MW per \$\text{B}.
+  \item \textbf{Measurement update:} when \(y_t\) arrives (restudy, PRA result, outage), update \(p(\omega)\); update \(\mathcal{D}_t\) (SRIC/SREC, CIL/LCR, ETC, POI de‑rates); project to \(\mathcal{D}_t\); recompute \(\MRV/\ASCDE/\)ARQ.
+  \item \textbf{ARQ sequencing:} Score \(= w_1\cdot\)Reliability‑Lift \(+ w_2\cdot\)Survival \(+ w_3\cdot\)Deliverability \(- w_4\cdot\)Upgrade \$/MW; require COD P50/P90 proof; publish affected‑system risk.
+  \item \textbf{Governance:} stamp outputs with Annex‑E QA (As‑of, Recency\_Risk, anomaly pass, reproducibility capsule), lineage tokens \([C00,\ LCOE\_Guard,\ RA\_VOLL,\ D\_POI]\).
+\end{enumerate}
+
+\subsection{PRA signal alignment (liftable fixes)}
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{Deliverability‑conditioned Systemwide curve (minimal surgery):} for each price \(p\), distribute the System increment into subregions within SRIC/SREC + the Energy Transfer Constraint; accredit as deliverable ELCC; sum to \(Q^{\mathrm{del}}_{\mathrm{SYS}}(p)=\sum_z q_z(p)\). The System curve becomes the \emph{feasible sum}, not a copper plate.
+  \item \textbf{Subregional‑only with system shadow value (cleanest physics):} clear on Subregional RBDCs only; report the system price as the shadow value of the transfer envelope.
+\end{itemize}
+
+\section{Mathematical supplements: policy tuning and time‑series robustness}
+\label{sec:math-supp}
+
+\subsection{Concavity‑constrained learning (CSGP‑UCB)}
+Control levers with diminishing returns (reserve adders, DR intensity, storage dispatch limits, penalty weights) can be modeled with a \emph{Concave Spline GP (CSGP)}. Concavity: curvature coefficients \(\beta_j(x)\le 0\) (truncated MVN posterior after conditioning).
+
+\paragraph{Posterior (unconstrained).}
+\[
+\mu_*(a,x)=\mu_f(a,x)+K_{*,n}K_{n,n}^{-1}\!\left(y-\mu_f\right),\qquad
+\Sigma_* = K_{*,*}-K_{*,n}K_{n,n}^{-1}K_{n,*}.
+\]
+
+\paragraph{UCB with concavity.}
+With feature vector \(c_t(a)\),
+\[
+a_t=\arg\max_a \ \mu_t^{\mathrm{c}}(a,x_t)+\sqrt{\alpha_t}\,\sigma_{ct}(a,x_t),
+\quad
+\mu_t^{\mathrm{c}}=\mathbb{E}[c_t(a)^\top\beta_t\mid\beta\le 0],\ 
+\sigma_{ct}^2=c_t^\top\Sigma_t c_t.
+\]
+Bayesian regret \(R_T=\tilde O\!\big(\sqrt{T\,\gamma_T\,\alpha_T}\big)\) (e.g., \(\gamma_T=O(J\log^{d+1}\!T)\) for additive kernels).
+
+\subsection{Gap/glitch‑aware spectral math for OPF/RA series}
+\paragraph{Windowed DFT around gaps.}
+\[
+\tilde h_w(f)=\Delta t\sum_{n=0}^{N-1} w_n\,h(t_n)\,e^{-2\pi i f t_n},
+\qquad
+\mathrm{SNR}_w = 4\,\Delta f\!\int_{f_{\min}}^{f_{\max}}\!
+\frac{|\tilde h_w(f)|^2}{S_{\mathrm{eff}}(f)}\,df,
+\]
+\[
+S_{\mathrm{eff}}(f)=\!\int_{-f_s/2}^{f_s/2}\!|\tilde w(f-f')|^2 S_n(f')\,df'.
+\]
+
+\paragraph{Matched‑filter glitch statistic (multi‑channel).}
+\[
+\mathcal F(\theta)=\sum_{c=1}^{p}\frac{1}{2}\,
+\frac{|\langle h_c(\theta),\,y_c\rangle|^2}{\langle h_c(\theta),\,h_c(\theta)\rangle},
+\qquad
+\langle a,b\rangle=\sum_k \frac{\tilde a(k)\,\tilde b^*(k)}{S_c(f_k)}.
+\]
+
+% ---------- Deliverability polytope and D estimator ----------
+\section{Deliverability Polytope and Practical Estimation of \texorpdfstring{\(D\)}{D}}
+\label{sec:deliverability-polytope}
+
+\subsection{Feasible region}
+Let \(f\in\mathbb R^{L}\) be line flows, \(g,\ell\in\mathbb R^{N}\) be nodal generation and load,
+and \(\mathrm{PTDF}\in\mathbb R^{L\times N}\).
+For a DC linearization about an AC baseline,
+\[
+f = \mathrm{PTDF}\,(g-\ell),\qquad -f^{\max} \le f \le f^{\max}.
+\]
+Define the deliverability polytope for incremental injections \(x\) at buses as
+\[
+\mathcal D = \left\{ x\in\mathbb R^{N}:\ 
+-f^{\max}+f_0 \le \mathrm{PTDF}\,x \le f^{\max}-f_0,\ \mathbf{1}^\top x=0 \right\},
+\]
+where \(f_0\) is the baseline flow vector and the balance constraint enforces a slack.
+
+\subsection{Closed-form POI-based \texorpdfstring{$D$}{D} (headroom ratio)}
+For an incremental \(+1\) MW at POI \(s\) with withdrawal at slack \(r\),
+the line impact is \(\Delta f_\ell = \alpha_{\ell s} = \mathrm{PTDF}_{\ell s}-\mathrm{PTDF}_{\ell r}\).
+Let headroom \(m_\ell^\pm = \pm(f_\ell^{\max}-f_{0,\ell})\) (sign chosen by \(\alpha_{\ell s}\)).
+Then the largest feasible injection before any limit is
+\[
+\Delta^\star = \min_{\ell:\ \alpha_{\ell s}\neq 0}\ \frac{m_\ell^\pm}{|\alpha_{\ell s}|}.
+\]
+With voltage/reactive/POI derates encoded as \(\eta\in(0,1]\),
+\[
+D \;\approx\; \eta \cdot \min\!\Big(1,\ \frac{\Delta^\star}{1\ \mathrm{MW}}\Big).
+\]
+This “headroom over PTDF impact” gives a conservative \(D\) quickly; we then refine \(D\) by checking a few binding sets using the linearized OPF.
+
+% ---------- CVaR-MRV ----------
+\section{Risk-Averse Valuation: CVaR-MRV}
+\label{sec:cvar-mrv}
+
+To incorporate tail risk explicitly, define zonal CVaR of unserved energy at level \(\alpha\in(0,1)\),
+\(\mathrm{CVaR}_\alpha(\EUE_z)\).
+The risk‑averse marginal value is
+\[
+\MRV^{(\alpha)}_z \;=\; -\,\VOLL\cdot 
+\frac{\partial\,\mathrm{CVaR}_\alpha(\EUE_z)}{\partial \MWdel_z}.
+\]
+Decision rule: accept while \(\MC \le \MRV^{(\alpha)}_z\).
+By subadditivity and monotonicity of CVaR, this is conservative relative to the mean‑based \(\MRV_z\); we report both with P10/P50/P90 bands.
+
+% ---------- Scenario reduction and complexity ----------
+\section{Scenario Reduction and Computational Complexity}
+\label{sec:complexity}
+
+\paragraph{Scenario reduction.}
+Construct an ensemble on net-load/availability trajectories and map to a low‑cardinality set via
+Wasserstein \(k\)-medoids (distance on seasonal profiles). Preserve weights \(w_k\) and recompute
+\(\MRV_z=\sum_k w_k\,\MRV_{z}^{(\omega_k)}\).
+This maintains geographic/seasonal structure while keeping \(K\) small.
+
+\paragraph{Complexity.}
+Let \(M\) candidates, \(K\) scenarios, \(L\) lines.
+With precomputed \(\mathrm{PTDF}\), computing \(D\) is \(O(L)\) per candidate (headroom ratio).
+Evaluating \(\Delta \EUE_z^{(\omega_k)}\) uses a screened linear solve or look‑up from AC baseline sensitivities.
+Overall, \(\tilde O(MK L)\) arithmetic dominates, but constant factors are small (sparse BLAS).
+We amortize by caching binding sets and reusing factorizations across candidates in the same zone.
+
+\paragraph{Hooks into the UEVF stack.}
+CSGP‑UCB for \(\kappa\), DR caps, penalties; glitch‑robust LMP/flow/ACE pre‑filters; document in QA Annex and scenario engine.
+
+\section{Policy Implications}
+Conditioning system valuation on deliverability removes the copper-plate artifact and aligns the PRA with the network we actually operate. Subregional-only clearing with a reported system shadow value further clarifies signals. In both designs, the UEVF/ASCDE + ARQ stack provides a transparent, audit-ready path that improves reliability at lower delivered cost by ranking projects that relieve binding constraints first.
+
+\subsection{Governance and adoption pathway for ARQ}
+\paragraph{Roles.} RTO (market design, accreditation harmonization); state regulators (cost recovery, RA rules); transmission owners (deliverability upgrades); developers (project data); consumer advocates (VOLL posture).
+
+\paragraph{Decision metric.} Net present value of reliability benefit:
+\[
+\mathrm{NPV}_{\text{RA}}(z)
+=\sum_{y=1}^{Y}\frac{\mathrm{VOLL}\cdot\Delta \mathrm{EUE}_{z,y}}{(1+r)^y}
+-\sum_{y=1}^{Y}\frac{\Delta \mathrm{Cost}_{z,y}}{(1+r)^y},
+\]
+with $r$ the social discount rate; report P10/P50/P90 using scenario spread.
+
+\begin{table}[h]
+\centering
+\caption{Policy adoption checklist and scorecard (illustrative)}
+\begin{tabular}{@{}p{4cm}ccc p{6.5cm}@{}}
+\toprule
+\textbf{Metric} & \textbf{Unit} & \textbf{Target} & \textbf{Weight} & \textbf{Notes}\\
+\midrule
+MW relief per \$M & MW/\$M & $\uparrow$ & 0.30 & RA-MW per \$B (P50) \\
+Stakeholder consensus & index [0,1] & $\ge 0.7$ & 0.20 & survey of working groups \\
+Upgrade lead time & months & $\downarrow$ & 0.15 & with permitting friction \\
+Deliverability risk & index [0,1] & $\downarrow$ & 0.20 & $D$ stress @ 0.85, 0.70 \\
+Consumer bill impact & \% & $\downarrow$ & 0.15 & rate-case analysis \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Regulatory filing skeleton (protocol).}
+Docket cover $\to$ problem statement (copper-plate paradox) $\to$ methods (Annex~F; O; P–U) $\to$ metrics (RA-MW/\$B; Net~\$/RA-MW) $\to$ scenario levers (VOLL, ELCC, $D$) $\to$ implementation timeline (pilot zones; refresh SLA).
+
+\section{Cross-ISO Generalization (PJM, CAISO)}
+\paragraph{Unified MRV.}
+For ISO $\in\{\text{MISO},\text{PJM},\text{CAISO}\}$, define
+\[
+\mathrm{MRV}_{\mathrm{ISO},z}
+\;=\;
+-\,\VOLL_{\mathrm{ISO}}\,
+\frac{\partial \E[\mathrm{EUE}_{\mathrm{ISO},z}]}{\partial \mathrm{MW}^{\mathrm{del}}_{\mathrm{ISO},z}},
+\qquad
+\mathrm{MW}^{\mathrm{del}}_{\mathrm{ISO},z}
+= \mathrm{ELCC}_{\mathrm{ISO},k,z,s}\,D^{\mathrm{POI}}_{\mathrm{ISO},z}\,\mathrm{MW}^{\text{nameplate}}_{k,z}.
+\]
+\paragraph{RA constructs.}
+Map RA counting rules and intertie management: PJM RPM (VRR curve; deliverability tests), CAISO backstop (RMR/RA import constraints). Replace PRA-specific parameters with their ISO analogs; leave the Annex~F engine unchanged.
+
+\begin{table}[h]
+\centering
+\caption{ARQ fast-lane tuning across ISOs (protocol choices)}
+\begin{tabular}{@{}l p{3.2cm} p{3.2cm} p{3.2cm}@{}}
+\toprule
+ & \textbf{MISO (PRA)} & \textbf{PJM (RPM)} & \textbf{CAISO (RA)}\\
+\midrule
+RA target & PRM + 0.1 d/yr & VRR curve level & System/Local RA targets \\
+Deliverability & $D^{\mathrm{POI}}$ polytope & Zonal deliverability test & Import/transfer caps \\
+Price signal & PRA shadow or zonal spread & LMP/CONG in RPM outcome & LMP/backstop rents \\
+ARQ metric & RA-MW/\$B; Net~\$/RA-MW & same & same \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\appendix
+
+\section{Annex A: Energy/ROW Extended Methods (v2.2)}
+\subsection*{ASCDE \& Reliability Calculus}
+\noindent\ASCDE and MRV as defined above; seasonal $\ELCC$; RA adder $\left(\frac{\EUE}{\text{Load}}\right)\VOLL$; PRM mapping; deliverability factor $\Ddel$ applied per resource and POI. MRV decision rule $\MC\le\MRV$ with sensitivity bands (VOLL $\pm$15\%; ELCC $\pm$20\%).
+
+\subsection*{Deliverability \& COD}
+Maintain $\Ddel$ and enforce POI de-rates; publish COD P50/P90 from KM/Weibull priors; align COD with MTEP in-service and affected-system outcomes.
+
+\subsection*{Queue \& Seam Triage}
+Pre-screen cross-seam POIs; if affected-system risk high, incorporate exogenous timeline into COD probability and lower rank unless RA benefit is exceptional.
+
+\subsection*{ARQ Scoring}
+$S=w_1\cdot$Reliability Lift$+w_2\cdot$Survival$+w_3\cdot$Deliverability$-w_4\cdot$Upgrade \$/MW; publish $w_i$, COD proof, and overrides. Provide P10/P50/P90 for Net \$/RA-MW and RA-MW/\$B.
+
+
+\subsection*{Scenario Levers \& Alerts}
+Levers: VOLL; ELCC bands; deliverability stress; upgrade cap; $\kappa$ uplift; drop\_projects; IRP toggles; weather subsets. Threshold alerts: $\LOLE>0.1$ d/yr; utilization $>100\%$; Net \$/RA-MW $<0$ in $>10\%$ runs.
+
+
+\section{Annex D: Command Lexicon (Extended)}
+\textbf{Analysis toggles:} \texttt{assumptions}, \texttt{lineage}, \texttt{export csv/excel}, \texttt{scenario: <lever>=<value>}, \texttt{ops posture}, \texttt{policy brief}, \texttt{li post}, \texttt{quick take}, \texttt{long form}, \texttt{redteam}, \texttt{suppress redteam}. \\
+\textbf{Audit tokens:} [C00], [LCOE\_Guard], [RA\_VOLL], [ARQ\_w1w2w3w4], [BROWSE], [D\_ELCC], [D\_POI], [THRESHOLD\_ALERT].
+
+\section{Annex E: QA, Freshness \& Reproducibility (v1.0)}
+As-of \& Recency\_Risk; anomaly pass; licensing \& confidentiality; re-run triggers \& freshness SLA; open questions \& next data hooks; reproducibility capsule (code hash, dataset checksums, seeds, environment, figure recipes).
+
+% ---------- Validation & reporting ----------
+\section{Validation, Back-Testing, and Reporting}
+\label{sec:validation}
+
+\paragraph{Back-test.}
+Select historical seasons with known PRA outcomes and outages.
+Freeze data vintages (\textit{as-of} stamps), run the ensemble, and compare:
+(i) zonal scarcity episodes vs predicted \(\MRV_z\) spikes,
+(ii) realized deliverability vs estimated \(D\),
+(iii) relative ranking stability of ARQ vs realized COD/upgrade outcomes.
+
+\paragraph{KPIs.}
+Hit rate of \(\MRV_z\) spike days; MAE of \(D\) vs deliverability test; Kendall \(\tau\) of ARQ ranking vs realized COD; portfolio Net \$/RA‑MW vs benchmark.
+
+\paragraph{Reporting (regulatory).}
+Each result ships with: As‑of date/timezone; Recency\_Risk; anomaly summary; reproducibility capsule (code hash, dataset checksums, seeds, environment); lineage tokens [C00, LCOE\_Guard, RA\_VOLL, D\_POI]; and a table that states which constraints bound (SRIC/SREC, CIL/LCR, POI de‑rate) and the associated shadow values.
+
+\newpage
+
+\section{Annex E — QA, Freshness \& Reproducibility (v1.1)}
+\label{annex:E}
+
+\subsection*{Purpose and philosophy}
+Annex~E operationalizes the quality bar for the full stack: data ingestion, physics (AC baselines $\rightarrow$ DC/PTDF linearization), optimization (OPF and SDDP), uncertainty (scenario design and reduction), and reporting. The aim is \emph{decision-grade reproducibility}: a technically defensible pipeline whose outputs are (i) deterministic within tight tolerances, (ii) physically faithful (AC$\leftrightarrow$DC \& deliverability $D$), (iii) optimization-converged with documented value-function cuts, and (iv) statistically adequate with preserved scarcity tails. A release \emph{passes} only when the acceptance thresholds below are met.
+
+\paragraph{Scope \& acceptance logic.}
+We certify four domains: \textbf{(1) Reproducibility}, \textbf{(2) Numerical fidelity (AC$\leftrightarrow$DC \& $D$)}, \textbf{(3) Optimization convergence (SDDP/OPF)}, and \textbf{(4) Scenario adequacy}. Each domain has explicit tests, artifacts, and pass/fail thresholds. If any critical field (IDs/dates/MW/ELCC/EUE) exhibits $>\!1\%$ nulls or type mismatches \emph{at any stage}, execution halts with a red flag until resolved.
+
+\subsection{ Scope \& Acceptance Criteria (Top-Line)}
+\label{E1}
+Tables~\ref{tab:E1}-\ref{tab:E4} summarize the pass/fail gates for determinism, AC$\leftrightarrow$DC fidelity, SDDP convergence, and scenario adequacy. Sections~\ref{E2}--\ref{E12} detail the measurement and artifacts.
+
+\begin{table}[h]
+\centering
+\caption{Annex E — Determinism \& Reproducibility Targets (Table E.1)}
+\label{tab:E1}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Metric} & \textbf{Target} & \textbf{Evidence/Artifact} \\
+\midrule
+Objective reproducibility (rerun) & $\le \pm 0.05\%$ (total expected cost) & seeds.json, solver.yml, hashes \\
+MRV$_z$ reproducibility (seasonal P50) & $\le \pm 1.0\%$ (all $z$) & annexE\_oos.csv; annexE\_cuts.csv \\
+LP/OPF numerical tolerances & primal/dual feas $\le 10^{-7}$; gap $\le 5\times 10^{-4}$ & solver.yml; logs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Annex E — AC$\leftrightarrow$DC Fidelity \& Deliverability $D$ (Table E.2)}
+\label{tab:E2}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Test} & \textbf{Target} & \textbf{Evidence} \\
+\midrule
+Flow error (P95 across scenarios) & $\max_\ell |f^{AC}_\ell - f^{DC}_\ell| \le 2\%\,f^{\max}_\ell$ & AC spot-checks report \\
+PTDF stability band & $\Delta\mathrm{PTDF} \le 0.5\%$ (seasonal re-linearization) & PTDF diffs \\
+Deliverability safety @ POI $b$ & No AC limit hit for DC-feasible injection $\le D(b)$ & $D$ validation table \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Annex E — SDDP Convergence \& Stability (Table E.3)}
+\label{tab:E3}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Metric} & \textbf{Target} & \textbf{Evidence} \\
+\midrule
+Optimality gap & $\le 0.5\%$ of total expected cost & sddp\_log.csv \\
+Cut saturation (stages $5\!:\!T$) & $\Delta V_t<0.1\%$ in last 3 iters & cut\_evolution.csv \\
+OOS recourse error (holdout set) & P50 $\le 3\%$; tail CVaR within band & annexE\_oos.csv \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Annex E — Scenario Adequacy (Wasserstein + Tails) (Table E.4)}
+\label{tab:E4}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Metric} & \textbf{Target} & \textbf{Evidence} \\
+\midrule
+$W_1$ (pre $\rightarrow$ post) & Reported; must be small relative to cost Lipschitz $L$ & scenario\_audit.json \\
+Tail weight error & $\le 0.5\ \mathrm{pp}$ per tail bucket & scenario\_audit.json \\
+Holdout OOS recourse error & P50 $\le 3\%$ & annexE\_oos.csv \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Data Lineage Matrix}
+\label{E2}
+Every figure/table carries a line-item lineage: \emph{[source file | sheet/page | columns | rows | transforms/tokens]}. We show an excerpt; the full matrix ships as \texttt{annexE\_lineage.csv}. Any critical-field null/type rate $>\!1\%$ \emph{halts} the run before computation.
+
+\begin{table}[h]
+\centering
+\caption{Annex E — Data Lineage Matrix (excerpt)}
+\label{tab:lineage}
+\begin{tabular}{@{2cm}lllllp{4.5cm}@{}}
+\toprule
+\textbf{Output} & \textbf{Source File} & \textbf{Sheet/Page} & \textbf{Cols} & \textbf{Rows} & \textbf{Transforms / Tokens} \\
+\midrule
+MRV$_{z}$ map (Summer) & \texttt{AC\_Baselines\_MI.xlsx} & S=Summer\_AC & B--AG & 2--741 & PTDF export; [D\_POI]; [D\_ELCC] \\
+ASCDE panel & \texttt{UEVF\_IQ.csv} & -- & type,cost,ELCC & 1--N & [C00]; [RA\_VOLL]; USD(2025) deflator=1.00 \\
+ARQ rank LRZ-7 & \texttt{Queue.csv} & -- & id,MW,COD & 1--N & Lognormal capex tail fit; survival P50/P90 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Why this matters.}
+The lineage matrix enables \emph{row-level} traceability of every metric back to primary columns, with the exact transforms (unit conversions, deflators, deliverability tokens). This is essential for auditability and independent replication.
+
+\subsection{\texorpdfstring{\quad}{ }Determinism \& Seeds (Repro Capsule)}
+\label{E3}
+We eliminate pseudo-random drift by fixing all stochastic sources and numerical tolerances. Shipped artifacts:
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{seeds.json}: \{\texttt{scenario\_seed}, \texttt{sddp\_seeds}[t], \texttt{lp\_tiebreak}\}.
+  \item \textbf{solver.yml}: primal/dual feasibility $\le 10^{-7}$, optimality gap $\le 5\times 10^{-4}$ (annual cost units), presolve=ON, crossover=OFF. 
+  \item \textbf{env\_hash.txt}: compiler/BLAS/solver versions; code commit hash and data checksums.
+\end{itemize}
+
+\noindent\textbf{Acceptance.} Two clean re-runs must match total expected cost within $\pm 0.05\%$ and MRV$_z$ within $\pm 1.0\%$ (seasonal P50, all $z$). Discrepancies trigger a numerical-stability investigation (basis changes, degeneracy, or cut-selection sensitivity).
+
+\subsection{ SDDP Convergence \& Stability}
+\label{E4}
+We publish iteration-by-iteration logs: expected cost (forward), lower bound (backward), gap, cut counts per stage, and cut aging. Convergence is asserted when: (i) gap $\le 0.5\%$, (ii) stage-wise value changes $<0.1\%$ over the last three iterations (stages $5{:}T$), and (iii) holdout out-of-sample (OOS) recourse error P50 $\le 3\%$.
+
+\begin{lstlisting}[style=annexe,caption={Artifacts emitted for SDDP convergence},label={lst:artifacts}]
+sddp_log.csv          # iter, E[cost]_fwd, LB_bwd, gap_pct, time_s
+cut_evolution.csv     # iter, stage, n_cuts, delta_V_pct
+annexE_cuts.csv       # stage, alpha, beta_norm, timestamp
+annexE_oos.csv        # scenario_id, recourse_cost, MRV_delta
+\end{lstlisting}
+
+\paragraph{Nuance.}
+Because recourse LPs can be degenerate, subgradient selection is stabilized via mild perturbations and averaging across scenarios. We track cut \emph{effectiveness} (marginal improvement to stage value) and age out stale cuts to avoid numerical decay.
+
+\subsection{AC\texorpdfstring{$\leftrightarrow$}{<->}DC Fidelity Tests (Deliverability \texorpdfstring{$D$}{D}-linked)}
+\label{E5}
+DC/PTDF linearizations inherit validity from seasonal AC baselines. We quantify fidelity three ways:
+
+\begin{enumerate}[leftmargin=1.2em]
+  \item \textbf{Flow error:} $|f^{AC}_\ell - f^{DC}_\ell| \le 2\%\,f^{\max}_\ell$ at P95 across scenarios.
+  \item \textbf{PTDF stability:} Re-linearize by season; require $\Delta\mathrm{PTDF}\le 0.5\%$ vs. prior baseline.
+  \item \textbf{Deliverability safety:} For each POI $b$, DC-feasible incremental injection up to $D(b)$ must not produce an AC violation in spot checks (sampled across seasons). 
+\end{enumerate}
+
+\noindent Rationale: deliverability $D$ is a conservative contraction derived from PTDF headroom. Its \emph{safety} is verified against the AC model to ensure accreditation does not over-count MW that cannot physically flow in stressed conditions.
+
+\begin{table}[h]
+\centering
+\caption{Annex E — AC$\leftrightarrow$DC Fidelity Report (template)}
+\label{tab:acdctemplate}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Zone} & \textbf{Flow error (P95)} & \textbf{PTDF stability} & \textbf{$D$ safety (AC spot)} \\
+\midrule
+LRZ--7 & $\le 1.4\%$ & pass ($\Delta$PTDF $\le 0.3\%$) & no overflow @ $D(b)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{ Scenario-Reduction Audit (Wasserstein + Tails)}
+\label{E6}
+We reduce scenarios via 1-Wasserstein $k$-medoids with explicit tail-weight constraints. Let $\widehat{\mathbb{P}}$ denote the empirical (pre-reduction) distribution and $\mathbb{Q}_m$ the reduced one; we report $W_1(\widehat{\mathbb{P}},\mathbb{Q}_m)$ and tail-weight deviations (in percentage points).
+
+\paragraph{Error control.}
+If the recourse value $Q(\omega)$ is Lipschitz in the ground metric with constant $L$, then
+\[
+\big| \E_{\widehat{\mathbb{P}}}[Q]-\E_{\mathbb{Q}_m}[Q]\big|\ \le\ L\,W_1(\widehat{\mathbb{P}},\mathbb{Q}_m).
+\]
+We accompany the bound with an \emph{empirical} OOS check on a stratified holdout set: P50 error $\le 3\%$, tail CVaR inside the configured bands.
+
+\begin{table}[h]
+\centering
+\caption{Annex E — Scenario Audit (example)}
+\label{tab:scenarioaudit}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Season} & \textbf{$W_1$ (pre$\rightarrow$post)} & \textbf{Tail weight error} & \textbf{OOS recourse P50} \\
+\midrule
+Summer & $0.00 \rightarrow 0.06$ & $\le 0.5$\,pp & $2.1\%$ \\
+Winter & $0.00 \rightarrow 0.05$ & $\le 0.4$\,pp & $2.6\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For LP recourse with affine data, $\lvert Q_t(\omega)-Q_t(\omega')\rvert \le L\,\|\omega-\omega'\|$ with
+$L \le \sup_{y\in\mathcal{Y}}\|J^\top y\|_*$, where $J$ is the $(A,b)$ Jacobian and $y$ ranges over optimal duals.
+We log an empirical $\widehat L$ and audit $L\,W_1(\widehat{\mathbb{P}},\mathbb{Q}_m)$ alongside out-of-sample tests.
+
+\subsection{ Unit/Scale/Type QA (Hard Checks)}
+\label{E7}
+\begin{itemize}[leftmargin=1.2em]
+  \item Currency: USD~2025 (deflator $=1.00$); any mix is auto-converted, and the conversion logged.
+  \item Time zone: America/Detroit for all timestamps.
+  \item Sign conventions: injections $+$, withdrawals $-$; nodal balance sign confirmed in OPF export.
+  \item Null/type thresholds: if any critical field exceeds $1\%$ null/type mismatch, \textbf{halt} and surface a remediations list.
+\end{itemize}
+
+\subsection{ Red-Team \& Bias Register}
+\label{E8}
+We maintain adversarial tests and acceptance thresholds:
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{Counter-cases:} (i) No-transfer island; (ii) $D=0.7$ stress; (iii) ELCC $-20\%$; (iv) VOLL $\in\{\$10,\$15,\$25\}\,\mathrm{k}/\mathrm{MWh}$.
+  \item \textbf{Selection-bias guard:} Re-estimate MRV on holdout weather-years; require Kendall $\tau \ge 0.6$ vs. full-sample ARQ ranks.
+  \item \textbf{Operator-dependence guard:} Restudy-shock replay (updated $D$ and constraints) must preserve the sign of MC$\le$MRV recommendations in $>\!85\%$ of cases.
+\end{itemize}
+
+\subsection{ Determinism Artifacts (What We Ship)}
+\label{E9}
+We provide all files needed to recreate results to tolerance:
+
+\begin{lstlisting}[style=annexe]
+annexE_repro.json   # seeds, tolerances, OS/BLAS/solver versions
+annexE_hashes.txt   # dataset checksums; code commit; figure recipes
+annexE_cuts.csv     # stage, alpha, beta, beta_norm, timestamp
+annexE_oos.csv      # holdout scenario IDs, recourse costs, MRV deltas
+scenario_audit.json # W1 pre/post, tail weights per bucket, constraints satisfied
+\end{lstlisting}
+
+\subsection{ Freshness SLA (Triggers to Modules)}
+\label{E10}
+We mark deliverables \emph{stale} and auto-refresh when any trigger fires. The SLA binds which modules must be re-run and within what time window.
+
+\begin{table}[h]
+\centering
+\caption{Annex E — Freshness SLA (Table E.5)}
+\label{tab:freshness}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Trigger} & \textbf{Module to Re-run} & \textbf{SLA} \\
+\midrule
+Tariff / docket change & AC baselines, PTDF, $D$ & 7 days \\
+Queue COD update & ARQ, MRV maps, Annex D back-tests & 7 days \\
+ISO posting affecting RA & ELCC tables, MRV/ASCDE & 7 days \\
+Age $>\,90$ days & Full Annex E suite & 14 days \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{ Licensing \& Confidentiality}
+\label{E11}
+We record the license/terms for each external source (e.g., EIA terms, ISO notices) and avoid redistributing restricted datasets. We ship checksums and processing recipes; PII and contract-confidential rates are redacted.
+
+\subsection{ Open Questions \& Next Data Hooks}
+\label{E12}
+We keep a standing table of missing/desirable inputs to reduce uncertainty in subsequent releases.
+
+\begin{table}[h]
+\centering
+\caption{Annex E — Next Data Hooks (excerpt)}
+\label{tab:datahooks}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Field} & \textbf{Source} & \textbf{Priority} & \textbf{Status} \\
+\midrule
+Seasonal ELCC by sub-zone & ISO accreditation report & High & Requested \\
+POI thermal/reactive tests & T\&D planning files & High & In progress \\
+Fuel/carbon regime priors & EIA/market data & Medium & Collected \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Integration notes (how Annex E ties to Annex F and main text)}
+Annex~E supplies the evidence that the optimization in Annex~F (multi-stage SDDP with OPF recourse) is (i) deterministic to tight tolerances, (ii) physically faithful (AC$\leftrightarrow$DC) with conservative deliverability $D$, (iii) converged in the dynamic-programming sense (cut stability \& optimality gap), and (iv) statistically adequate under scenario reduction with preserved scarcity tails. In the main text, we therefore treat the MRV/ASCDE comparisons as \emph{decision-valid} because (a) MRV is computed from recourse duals with reproducibility guarantees, (b) ASCDE uses consistent units/scales with currency/timezone governance, and (c) scenario levers (VOLL, ELCC bands, deliverability stress) are exercised and logged with threshold alerts.
+
+\paragraph{As-of discipline and tokens.}
+Each release is stamped \emph{As of: YYYY-MM-DD (America/Detroit)} with \emph{Recency\_Risk} and Annex tokens: \texttt{[C00]} (00-Protocol applied), \texttt{[RA\_VOLL]} (reliability monetized via VOLL), \texttt{[D\_ELCC]} (seasonal ELCC), \texttt{[D\_POI]} (deliverability at POI via PTDF headroom), \texttt{[ARQ\_w1w2w3w4]} (weights disclosed in ranking).
+
+
+\section{Annex — Multi-Stage Welfare-Optimal Expansion with OPF Recourse (Formal)}
+\label{sec:annexF}
+
+\subsection{ Notation and standing assumptions}
+
+\noindent\textbf{Time and sets.} Years $t=1,\dots,T$; seasons $s\in\mathcal{S}$; typical/tail hours $h\in\mathcal{H}_s$.\\
+\textbf{Network.} Buses $n$, lines $\ell$, PTDF matrix $\mathrm{PTDF}_{\ell n}$, line limits $\overline f_\ell>0$; slack bus fixed.\\
+\textbf{Technologies/zones.} Technologies $k\in\mathcal{K}$; zones $z\in\mathcal{Z}$.\\
+\textbf{State.} $s_t=\big(q^{\mathrm{dep}}_{t,k,z},\ \mathrm{TxCap}_{t,\ell},\ \mathrm{SOC}_{t}\big)$, where $q^{\mathrm{dep}}$ denotes dependable MW (nameplate $\times$ seasonal ELCC $\times$ deliverability $D$).\\
+\textbf{Decisions.} $x_t=(\Delta q_{t,k,z},\ \Delta\mathrm{TxCap}_{t,\ell},\ \Delta\mathrm{Storage}_{t})$.\\
+\textbf{Uncertainty.} $\omega_t=(d_{n,h},\,A_{t,k,z},\,p^{\mathrm{fuel}}_{t},\,p^{\mathrm{CO}_2}_{t},\,\text{FOR/tor})$ from a reduced scenario set (Sec.~\ref{sec:annexF_scenarios}).\\
+\textbf{Costs.} Convex generation costs $c_i(\cdot)$; fuel and carbon included in $c_i$ or as explicit terms; $\mathrm{VOLL}$ strictly exceeds any feasible marginal generation cost.\\
+\textbf{Security.} DC N-1 via filtered contingencies or security margins (Sec.~\ref{sec:annexF_security}).
+
+\begin{assumption}[Regularity]\label{assump:regularity}
+All recourse OPFs are feasible using nonnegative load-shedding $u\ge 0$ at penalty $\mathrm{VOLL}$. Recourse problems are linear programs (LPs) with unique optimal values; parameter dependence on $s_t$ is affine through capacity and flow limits.
+\end{assumption}
+
+\subsection{ Welfare objective with reliability monetization}
+
+We adopt an expected social welfare objective with reliability monetized by VOLL:
+\begin{equation}\label{eq:welfare_objective}
+\max_{\pi}\ \E\!\left[\sum_{t=1}^{T}\delta^t\Big(\mathcal{CS}_t+\mathcal{PS}_t
+- \mathrm{Fuel}_t - \mathrm{VarOM}_t - \mathrm{Carbon}_t
+- \underbrace{\mathrm{VOLL}\cdot \mathrm{EUE}_t}_{\text{reliability}}
+- \mathrm{CapEx}_t(x_t)\Big)\right],
+\end{equation}
+subject to (i) state transitions $s_{t+1}=f(s_t,x_t,\omega_t)$; (ii) seasonal resource adequacy (RA) constraints:
+\begin{equation}\label{eq:seasonal_RA}
+\sum_{k,z}\mathrm{ELCC}_{k,z,s}\,D_{k,z}\,q^{\mathrm{cap}}_{t,k,z} \ \ge\ \mathrm{PRM}_s\cdot \mathrm{PeakLoad}_{t,s}.
+\end{equation}
+With inelastic demand, $\mathcal{CS}_t$ is constant; maximizing \eqref{eq:welfare_objective} reduces to minimizing expected total cost (OpEx + CapEx + $\mathrm{VOLL}\cdot\mathrm{EUE}$).
+
+We adopt inelastic demand for the baseline welfare calculation,\footnote{An elastic-demand sensitivity is reported in Annex~O, where we quantify the impact of $\epsilon<0$ on LMPs, consumer surplus, and $\MRV$.} so consumer surplus is constant and the problem reduces to minimizing expected total cost (OpEx + CapEx + $\VOLL\cdot\EUE$).
+
+\subsection{ Operational recourse (DC SC-OPF)}
+\label{sec:annexF_recourse}
+
+For each $(t,s,h,\omega)$, define injections $p_{n}=\sum_{i\in \mathcal G_n}g_i - d_{n}(\omega) - u_{n}$.
+The recourse LP reads:
+\begin{align}
+\min_{g,u} \quad &
+\sum_{i} c_i(g_i) + \mathrm{VOLL}\sum_{n} u_{n}+ p^{\mathrm{CO}_2}_{t}\!\!\sum_{i}\mathrm{EF}_i g_i \label{eq:recourse_obj}\\
+\text{s.t.}\quad
+& \sum_{i\in\mathcal G_n} g_i - d_{n}(\omega) - u_{n}
+= \sum_{\ell}\mathrm{PTDF}_{\ell n} f_\ell,\ \forall n, \label{eq:recourse_balance}\\
+& |f_\ell| \le \overline f_{\ell}(s_t),\ \forall \ell, \label{eq:recourse_flowl}\\
+& 0\le g_{i} \le \overline g_{i}(s_t,\omega),\ \forall i, \label{eq:recourse_gencap}\\
+& u_{n}\ge 0,\ \forall n, \label{eq:recourse_shed}\\
+& \text{(N-1) via filtered contingencies or margins (Sec.~\ref{sec:annexF_security}).} \nonumber
+\end{align}
+Eliminate $f$ via $f=\mathrm{PTDF}\,p$ and enforce $|\mathrm{PTDF}\,p|\le \overline f$.
+Let the optimal value be $Q_t(s_t,\omega_t)$, $\mathrm{EUE}_t=\sum_n u_n$, and LMPs be the duals of \eqref{eq:recourse_balance}.
+
+\subsection{Bellman recursion and SDDP decomposition}
+
+Define the Bellman value:
+\begin{equation}\label{eq:bellman}
+V_t(s) \ =\ \min_{x\in \mathcal X(s)}\left\{\ \mathrm{CapEx}_t(x)\ +\ \E_{\omega_t}\big[Q_t(s,\omega_t)\big]\ +\ \delta\,\E\!\left[V_{t+1}\!\big(f(s,x,\omega_t)\big)\right]\ \right\}.
+\end{equation}
+
+\begin{proposition}[Convexity and cut representation]\label{prop:convexity_cuts}
+Under Assumption~\ref{assump:regularity} and convex investment costs, $V_t(\cdot)$ is convex in $s$. Moreover, $\E[Q_t(s,\omega_t)]$ is a finite supremum of supporting hyperplanes, hence
+\begin{equation}
+V_t(s) \ \ge\ \alpha_t^r + \langle \beta_t^r,\, s\rangle,\qquad r=1,2,\dots,
+\end{equation}
+for cut pairs $(\alpha_t^r,\beta_t^r)$ obtained from recourse dual solutions.
+\end{proposition}
+
+\begin{proof}
+Each recourse LP is convex and affine in $s$ through bounds $\overline g(s)$ and $\overline f(s)$. By strong duality and the envelope theorem, the optimal value is convex piecewise-linear in $s$. Expectation preserves convexity and piecewise linearity. The DP mapping of a convex function through affine transitions and convex costs remains convex. Cuts follow from subgradients (duals) evaluated at visited states (standard SDDP). 
+\end{proof}
+
+\subsection{ MRV as a recourse subgradient}
+
+Introduce a zonal dependable-capacity cap in recourse:
+\begin{equation}\label{eq:zonalcap}
+\sum_{i\in \mathcal G(z)} g_i \ \le\ A_{t,z}(\omega)\, q^{\mathrm{dep}}_{z},\qquad \text{dual } \pi_{z}\ge 0.
+\end{equation}
+
+\begin{lemma}[Envelope subgradient]\label{lem:envelope}
+For fixed $(t,\omega)$, if $Q_t(s,\omega)$ is the optimal recourse cost and $\pi_{z}$ is an optimal dual multiplier for \eqref{eq:zonalcap}, then
+\begin{equation}
+\frac{\partial Q_t}{\partial q^{\mathrm{dep}}_{z}}(s,\omega) \ =\ -\,\E\!\left[\pi_{z}\,A_{t,z}(\omega)\right]_{\text{over OPF randomization}},
+\end{equation}
+and thus $\partial \E[Q_t]/\partial q^{\mathrm{dep}}_{z} = -\,\E[\pi_{z} A_{t,z}]$.
+\end{lemma}
+
+\begin{proof}
+Parameter $q^{\mathrm{dep}}_{z}$ enters linearly on the RHS of a binding inequality. The envelope theorem for LPs gives the derivative of the optimal value as the negative of the associated optimal dual times the RHS derivative (here $A_{t,z}$). Taking expectation yields the claim.
+\end{proof}
+
+\begin{definition}[Marginal Reliability Value (MRV)]
+For zone $z$, define
+\begin{equation}
+\mathrm{MRV}_{z}\ :=\ \mathrm{VOLL}\cdot\left(-\,\frac{\partial\,\E[\mathrm{EUE}_t]}{\partial q^{\mathrm{dep}}_{z}}\right).
+\end{equation}
+\end{definition}
+
+\begin{proposition}[MRV equals zonal capacity shadow under high VOLL]\label{prop:mrv_equals_shadow}
+Suppose $\mathrm{VOLL}$ exceeds any feasible marginal generation plus congestion rents so incremental dependable MW first displaces load shedding before economic generation. Then
+\begin{equation}
+-\,\frac{\partial\,\E[Q_t]}{\partial q^{\mathrm{dep}}_{z}}\ =\ \mathrm{MRV}_{z}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+With sufficiently large VOLL, any feasible incremental injection from $q^{\mathrm{dep}}_{z}$ is first used to reduce $u$ (load shed). For $\Delta q>0$, construct a primal feasible adjustment that reduces $u$ by $\Delta u_z=\gamma\Delta q$ for some $\gamma\in[0,1]$ consistent with PTDF/security, holding generator outputs otherwise feasible. Objective reduction is $\mathrm{VOLL}\cdot \Delta u_z + o(\Delta q)$. Divide by $\Delta q$, take $\Delta q\downarrow 0$, and then expectation over $\omega$: the right derivative of expected cost equals $\mathrm{VOLL}\cdot (-\partial \E[\mathrm{EUE}]/\partial q^{\mathrm{dep}}_{z})$. By Lemma~\ref{lem:envelope} the same derivative equals $\E[\pi_{z}A_{t,z}]$. Equate to obtain the identity.
+\end{proof}
+
+\begin{corollary}[Local decision rule]\label{cor:local_rule}
+At the margin, adding dependable capacity in zone $z$ is welfare-improving iff the marginal capital cost $\mathrm{MC}_{z}\le \mathrm{MRV}_{z}$. This local rule is consistent with the global SDDP optimum, since the master problem uses these dual-derived gradients to update $V_t$.
+\end{corollary}
+
+\subsection{ Deliverability factor D from PTDF headroom}
+\label{sec:annexF_D}
+
+Let the base (seasonal) operating point be $p^0$ with flows $f^0=\mathrm{PTDF}\,p^0$.
+Inject $+1$ MW at POI $b$ and withdraw $-1$ MW at the slack: $\Delta f_{\ell}=\mathrm{PTDF}_{\ell b}$.
+Define headroom $H_\ell = \overline f_\ell - |f^0_\ell|$ and flow use $U_\ell = |\Delta f_\ell|$.
+
+\begin{definition}[Deliverability at bus $b$]
+\begin{equation}
+D(b)\ :=\ \min\!\left\{\,1,\ \min_{\ell}\ \frac{H_\ell}{U_\ell+\varepsilon}\,\right\},
+\end{equation}
+with small $\varepsilon>0$ to avoid division by zero. For a resource class in zone $z$, take $D_{k,z}$ as a conservative average of $D(b)$ over its POIs, or the minimum for accreditation.
+\end{definition}
+
+\noindent\emph{Numerical guard.} The parameter $\varepsilon>0$ prevents division by zero on insensitive lines; default $\varepsilon=10^{-6}$.
+
+\begin{proposition}[Outer-approximation feasibility]\label{prop:D_outer}
+Under DC flow and linearization, any injection up to $D(b)$ MW at bus $b$ is feasible w.r.t.\ base-case line limits. Thus $q^{\mathrm{dep}}=\mathrm{ELCC}\times D \times q^{\mathrm{nameplate}}$ is a reliability-consistent accreditation.
+\end{proposition}
+
+\begin{proof}
+For any $\alpha\in[0,D(b)]$, $\lvert f^0_\ell + \alpha \Delta f_\ell\rvert\le \lvert f^0_\ell\rvert + \alpha \lvert\Delta f_\ell\rvert \le \lvert f^0_\ell\rvert + H_\ell \le \overline f_\ell$.
+\end{proof}
+
+\begin{remark}
+N-1 can be included by replacing $H_\ell$ with contingency headroom (or enforcing security margins that embed the worst binding contingency). This yields a deliverability polytope; the scalar $D$ is a conservative contraction used in accreditation and the DP state.
+\end{remark}
+
+\subsection{Scenario construction and reduction (with error control)}
+\label{sec:annexF_scenarios}
+
+We construct $\omega_t$ from regime-switching factors and reduce scenarios via Wasserstein $k$-medoids while preserving tails.
+
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.25em]
+  \item \textbf{Regimes.} Fit a Markov chain over regimes $r\in\{1,\dots,R\}$ (e.g., mild/normal/hot/polar/smoky). Each regime pins distributions for $(d,\ A,\ p^{\mathrm{fuel}},\ p^{\mathrm{CO}_2})$.
+  \item \textbf{Typical days + tails.} For each season $s$ and regime $r$, cluster hourly feature vectors $(\text{net-load shape},\ \text{wind/solar},\ \text{temperature})$ into $k$ medoids and add the top $1$--$2\%$ net-load hours as explicit tail nodes.
+  \item \textbf{Wasserstein reduction.} Given an empirical distribution $\widehat{\mathbb{P}}$ of candidate scenarios, select $m$ representatives $y_1,\dots,y_m$ minimizing the 1-Wasserstein distance $W_1(\widehat{\mathbb{P}},\,\mathbb{Q}_m)$, where $\mathbb{Q}_m$ is the discrete measure at medoids with optimized weights, subject to tail weight constraints (CVaR buckets fixed).
+  \item \textbf{Error bound (sketch).} If the recourse value $Q_t(\cdot)$ is Lipschitz in $\omega$ with constant $L$ under the ground metric used by $W_1$, then
+  \[
+  \big| \E_{\widehat{\mathbb{P}}}[Q_t]-\E_{\mathbb{Q}_m}[Q_t]\big|\ \le\ L\cdot W_1(\widehat{\mathbb{P}},\mathbb{Q}_m).
+  \]
+  Lipschitzness holds for LP value functions under bounded data perturbations; tails are preserved explicitly, so scarcity cost is not under-weighted.
+\end{enumerate}
+
+\subsection{ Security (N-1) without explosion}
+\label{sec:annexF_security}
+
+Two tractable implementations:
+\begin{itemize}[leftmargin=1.2em,itemsep=0.25em]
+  \item \textbf{Contingency filtering.} Pre-solve baseline flows; screen in only contingencies whose PTDF-based post-contingency flows approach limits; enforce those in recourse.
+  \item \textbf{Security margins.} Inflate base-case limits $\overline f_\ell\leftarrow \overline f_\ell - \Delta_\ell$ with $\Delta_\ell$ calibrated from worst credible outages. This embeds N-1 conservatively in base constraints.
+\end{itemize}
+Both keep OPFs small LPs; both preserve the affine dependence on $s$ needed for Lemma~\ref{lem:envelope} and Proposition~\ref{prop:mrv_equals_shadow}.
+
+\subsection{ Complexity and compute budgeting}
+
+Let $Y=30$ years, $S=4$ seasons, $D=12$ typical days/season, $H=24$ hours/day. Per-year hours: $S\cdot D\cdot H=1{,}152$. With $M=100$ reduced scenarios: naive recourse solves/year $\sim 115{,}200$. Under SDDP, each iteration samples $P=10$--$20$ paths/year; convergence in $I=5$--$10$ iterations gives total OPFs:
+\[
+\text{OPFs} \approx I\cdot P \cdot 1{,}152 \ \in\ [57{,}600,\ 230{,}400],
+\]
+tractable with parallel DC OPF (seconds/solve; linear scaling across nodes).
+
+\subsection{ SDDP with OPF recourse — pseudocode}
+
+\begin{lstlisting}[style=annexpseudo,caption={SDDP with OPF recourse},label={lst:sddp}]
+Input: initial state $s_1$, horizon $T$, discount $\delta$, scenario generator $G(\cdot)$, tolerance $\varepsilon$
+Initialize: $\hat V_t(s) \equiv -\infty$ + supporting halfspace ($t=1..T$); policy warm-start (optional)
+
+repeat
+  // Forward pass
+  for t = 1..T:
+     draw $\omega_t \sim G(\cdot)$; solve recourse OPF $Q_t(s_t,\omega_t)$
+     record duals: $\pi_{z,t}$ (zonal caps), $\mu_{\ell,t}$ (flow limits), etc.
+     choose $x_t$ by minimizing $\mathrm{CapEx}_t(x_t) + \mathbb{E}[Q_t \mid \text{local cuts}] + \delta\, \hat V_{t+1}(f(s_t,x_t,\omega_t))$
+     update state $s_{t+1} = f(s_t,x_t,\omega_t)$
+  end
+
+  // Backward pass
+  for t = T..1:
+     for each visited state $\bar s_t$:
+        compute subgradient $\beta_t = \mathbb{E}[\, -\pi_z A_{t,z},\ -\mu_\ell \cdot \partial \overline f_\ell/\partial s,\ \ldots\, ]$
+        compute intercept $\alpha_t = (\text{observed recourse} + \text{downstream value}) - \langle \beta_t,\ \bar s_t \rangle$
+        update $\hat V_t(s) \leftarrow \max\{ \hat V_t(s),\ \alpha_t + \langle \beta_t,\ s \rangle \}$
+     end
+  end
+
+until expected optimality gap $\le \varepsilon$
+Return policy $\{x_t(\cdot)\}$ and value functions $\{\hat V_t(\cdot)\}$.
+\end{lstlisting}
+
+\paragraph{Cut coefficients (explicit).}
+For $q^{\mathrm{dep}}_{z}$: $\beta_{t,z} = -\,\E[\pi_{z} A_{t,z}]$ (Lemma~\ref{lem:envelope}).
+For $\mathrm{TxCap}_{\ell}$: if $|f_\ell|\le \overline f_\ell$, with duals $\mu_\ell^{+},\mu_\ell^{-}$,
+\[
+\beta_{t,\ell} = -\,\E\big[\mu_\ell^{+} - \mu_\ell^{-}\big]\cdot \frac{\partial \overline f_\ell}{\partial \mathrm{TxCap}_\ell}.
+\]
+For storage envelopes: analogous from SOC and power-limit duals.
+
+\subsection{ ASCDE, MRV, and welfare consistency}
+\label{sec:annexF_ASCDE_MRV}
+
+Recall
+\begin{equation}
+\mathrm{ASCDE}=\frac{\mathrm{CapEx}+\mathrm{FOM}+\mathrm{VarOM/Fuel}+\mathrm{Tx}+\mathrm{Storage}
++\mathrm{VOLL}\cdot\mathrm{EUE}-\mathrm{Market\ Value}}{\text{Reliable MWh}}.
+\end{equation}
+Let $\Delta q^{\mathrm{dep}}_{z}$ be a small zonal increment. The marginal welfare change is
+\begin{equation}
+-\,\frac{\partial\,\E[Q_t]}{\partial q^{\mathrm{dep}}_{z}} \ =\ \mathrm{MRV}_{z}
+\quad\text{(Prop.~\ref{prop:mrv_equals_shadow}),}
+\end{equation}
+while the marginal capitalized cost per dependable MWh equals the technology’s marginal ASCDE numerator divided by reliable MWh yield.
+
+\begin{theorem}[Local decision optimality]\label{thm:local_optimality}
+At the margin, adding dependable capacity in zone $z$ is welfare-improving iff its marginal ASCDE $\le \mathrm{MRV}_{z}$. Moreover, under convexity, the global SDDP solution implements the same condition in expectation by using recourse duals to shape $V_t$ cuts.
+\end{theorem}
+
+\begin{proof}
+From Proposition~\ref{prop:mrv_equals_shadow}, the marginal benefit equals $\mathrm{MRV}_z$. The marginal cost per reliable MWh is the linearized ASCDE quotient. If benefit $\ge$ cost, expected total cost falls. Convexity ensures that iteratively applying local linear decisions via SDDP converges to a global optimum obeying the same inequality in expectation.
+\end{proof}
+
+\subsection{ Calculation recipes (auditable)}
+\label{sec:annexF_calc_recipes}
+
+\paragraph{CR-1: Zonal MRV estimate at a given state/season.}
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.25em]
+  \item Solve the recourse OPFs for the reduced scenario set.
+  \item For each OPF, read the zonal cap dual $\pi_{z}$ and availability $A_{t,z}$.
+  \item Compute $\widehat{\partial \E[Q] / \partial q^{\mathrm{dep}}_{z}} = -\,\frac{1}{N}\sum \pi_{z}A_{t,z}$.
+  \item Report $\widehat{\mathrm{MRV}}_z = \frac{1}{N}\sum \pi_{z}A_{t,z}$ under the high-VOLL condition (Prop.~\ref{prop:mrv_equals_shadow}); or equivalently $-\mathrm{VOLL}\cdot \widehat{\partial \E[\mathrm{EUE}] / \partial q^{\mathrm{dep}}_{z}}$.
+\end{enumerate}
+
+\paragraph{CR-2: Deliverability $D$ at a POI.}
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.25em]
+  \item Compute base flows $f^0$ and headroom $H_\ell=\overline f_\ell-|f^0_\ell|$.
+  \item Compute $\Delta f=\mathrm{PTDF}\cdot e_b$ for 1-MW injection at POI $b$.
+  \item Set $D(b)=\min\{1,\min_\ell H_\ell/(|\Delta f_\ell|+\varepsilon)\}$.
+  \item Aggregate to $D_{k,z}$ across POIs (mean or min).
+\end{enumerate}
+
+\paragraph{CR-3: Benders cut at visited state $\bar s$.}
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.25em]
+  \item Solve OPFs, gather duals $(\pi,\mu,\dots)$.
+  \item Compute subgradient $\beta$ using the formulas above.
+  \item Compute intercept $\alpha = \big[\mathrm{CapEx}+ \E(Q) + \delta V_{t+1}(f(\bar s,\hat x,\omega))\big] - \langle \beta, \bar s\rangle$.
+  \item Add cut $V_t(s)\ge \alpha + \langle \beta,s\rangle$.
+\end{enumerate}
+
+\paragraph{CR-4: Scenario reduction audit.}
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.25em]
+  \item Report pre/post $W_1$ and tail weight discrepancies.
+  \item Re-solve OPFs on a stratified holdout scenario set; compute out-of-sample recourse cost error and require $\le 3\%$ at P50 (with tail CVaR bands within tolerance).
+\end{enumerate}
+
+\subsection{ Security and reliability thresholds (alerts)}
+Define LOLE/EUE sampling within SDDP passes. Trigger \texttt{THRESHOLD\_ALERT} if
+\[
+\Prob(\mathrm{LOLE} > 0.1\ \mathrm{days/yr}) > 0.10\quad\text{or}\quad
+\Prob(\mathrm{Net}\ \$/\mathrm{RA\!-\!MW} < 0) > 0.10.
+\]
+Expose levers: $\mathrm{VOLL}\in\{10,15,25\}$ k\$/MWh; ELCC $\pm\{10,20\}\%$; $D\in\{1,0.85,0.7\}$; carbon $\in\{0,50,100\}$ \$/t; tx-cap cap; storage arbitrage uplift $\kappa$; \texttt{drop\_projects} list.
+
+\subsection{ Implementation checklist (90-day)}
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.25em]
+  \item Seasonal AC baselines $\rightarrow$ export PTDF/LODF; compute $D$.
+  \item Uncertainty blocks $\omega_t$: regimes, typical-day medoids, tails, Wasserstein weights.
+  \item DC SC-OPF engine with security filtering or margins; parallel harness.
+  \item SDDP master with cut storage and warm-starts; route duals to cuts.
+  \item Reliability loop: compute MRV and ASCDE reports; publish RA-MW/\$B and Net \$/RA-MW with P10/P50/P90.
+  \item Audit \& dashboards: scenario reduction logs; cut counts; wall-clock; threshold alerts.
+\end{enumerate}
+
+\subsection{ Bias/uncertainty ledger (key assumptions)}
+\begin{itemize}[leftmargin=1.2em,itemsep=0.25em]
+  \item High-VOLL condition (Prop.~\ref{prop:mrv_equals_shadow}): $\mathrm{VOLL}$ $>$ any feasible marginal dispatch cost plus congestion $\Rightarrow$ marginal dependable MW first reduces EUE.
+  \item Linear DC model: AC nonlinearities captured via seasonal AC baselines; deviations handled by conservative $D$ and security margins.
+  \item Scenario reduction fidelity: tails explicitly preserved; Wasserstein distance audited (CR-4).
+  \item Dual stability: LP degeneracy handled by perturbations/tie-breaking; subgradient selection averaged over scenarios.
+\end{itemize}
+
+\subsection{ Decision-log appendix (what would change my mind)}
+\begin{itemize}[leftmargin=1.2em,itemsep=0.25em]
+  \item If AC nonlinearity invalidates PTDF stability around baselines $\Rightarrow$ recalibrate more frequently; consider linearized AC OPF.
+  \item If measured scarcity events show substantial non-EUE marginal effects (e.g., commitment inflexibility dominates) $\Rightarrow$ augment recourse with UC proxies or tighten scarcity pricing model.
+  \item If scenario reduction under-weights long-duration scarcity $\Rightarrow$ increase tail nodes / CVaR constraints.
+\end{itemize}
+
+\paragraph{Lineage \& tokens.}
+\texttt{[C00]} 00-Protocol applied; \texttt{[RA\_VOLL]} reliability monetized via VOLL; \texttt{[D\_ELCC]} seasonal ELCC used; \texttt{[D\_POI]} deliverability de-rate at POI via PTDF headroom; \texttt{[ARQ\_w1w2w3w4]} weights disclosed in main stack.
+
+\section{Annex — UC-Lite Scarcity Proxy and Robust MRV}
+\label{annex:H}
+
+\subsection{ Motivation and construction}
+The pure DC SC-OPF recourse of Annex~F prices reliability via $\mathrm{VOLL}\cdot\mathrm{EUE}$, which is exact when scarcity manifests as load shedding. In practice, scarcity can arise with $\mathrm{EUE}=0$ due to \emph{operational inflexibilities} (ramping, minimum output, start-up latencies). We therefore augment the recourse LP by a light-weight proxy that preserves linearity while capturing these effects.
+
+\paragraph{Blocks and reserves.}
+Partition each hour $h$ into two ramp blocks $b\in\{-,+\}$ representing downward/upward transitions from an aggregated prior dispatch. Introduce zonal upward reserve $R_{z,h}\ge 0$ with requirement $R^{\min}_{z,h}$ and ramp budgets $G^{\uparrow}_{z,h},G^{\downarrow}_{z,h}$.
+
+\subsection{ UC-lite recourse (LP)}
+For fixed $(t,s,h,\omega)$ and state $s_t$, the recourse becomes:
+\begin{align}
+\min_{g,u,r}\quad &
+\sum_{i} c_i(g_i) + \mathrm{VOLL}\sum_n u_{n}
++ \lambda^{\mathrm{res}} \sum_z r_{z} \label{eq:H_obj}\\
+\text{s.t.}\quad
+& \sum_{i\in \mathcal G_n} g_i - d_{n}(\omega) - u_{n}
+= \sum_{\ell}\mathrm{PTDF}_{\ell n} f_\ell,\ \forall n, \label{eq:H_balance}\\
+& |f_\ell|\le \overline f_{\ell}(s_t),\ \forall \ell, \qquad 0\le g_i\le \overline g_i(s_t,\omega), \label{eq:H_limits}\\
+& u_n\ge 0,\ \forall n, \\
+& \underbrace{\sum_{i\in\mathcal G(z)} \rho_i^{\uparrow} g_i}_{\text{flexible MW}} \ \ge\ R^{\min}_{z} - r_z,\quad r_z\ge 0,\ \forall z, \label{eq:H_reserve}\\
+& \sum_{i\in\mathcal G(z)} \left[g_i - g_i^{\mathrm{prev}}\right] \le G^{\uparrow}_{z},\quad
+\sum_{i\in\mathcal G(z)} \left[g_i^{\mathrm{prev}} - g_i\right] \le G^{\downarrow}_{z}, \label{eq:H_ramps}
+\end{align}
+where $\rho_i^{\uparrow}\in[0,1]$ tags the share of unit $i$ capable of contributing to upward flexibility (fast-start/AGC-like), $g_i^{\mathrm{prev}}$ is the prior-period aggregate dispatch, and $\lambda^{\mathrm{res}}$ is a \emph{reserve scarcity penalty} calibrated from observed scarcity prices (or set conservatively). Constraints \eqref{eq:H_reserve}--\eqref{eq:H_ramps} remain linear and induce a \emph{nonzero scarcity price} when upward capacity or ramp budgets bind even if $u=0$.
+
+\subsection{ Duals and MRV under UC-lite}
+
+Let $\sigma_z\ge 0$ be the dual on \eqref{eq:H_reserve} and $\phi^{\uparrow}_z,\phi^{\downarrow}_z\ge 0$ the duals on \eqref{eq:H_ramps}. Let $\pi_{z}$ be the dual on the zonal dependable-capacity cap (Annex~F). The OPF-KKT system yields the recourse value gradient:
+\begin{equation}
+-\frac{\partial \E[Q]}{\partial q^{\mathrm{dep}}_{z}} \ =\ \E\!\left[\pi_{z} A_{z}\right] \ +\ \E\!\left[\underbrace{\sigma_{z}\cdot \frac{\partial R^{\min}_{z}}{\partial q^{\mathrm{dep}}_{z}}}_{\text{reserve relief}}\right] 
+\ +\ \E\!\left[\underbrace{\phi^{\uparrow}_{z}\cdot \frac{\partial G^{\uparrow}_{z}}{\partial q^{\mathrm{dep}}_{z}} + \phi^{\downarrow}_{z}\cdot \frac{\partial G^{\downarrow}_{z}}{\partial q^{\mathrm{dep}}_{z}}}_{\text{ramp relief}}\right].
+\label{eq:H_grad}
+\end{equation}
+
+\begin{proposition}[Robust MRV decomposition]
+\label{prop:H_MRV}
+Under high-VOLL (so load-shed dominates when feasible) and UC-lite constraints \eqref{eq:H_reserve}--\eqref{eq:H_ramps}, the marginal welfare value of dependable MW in zone $z$ decomposes as
+\[
+\mathrm{MRV}_z \ =\ \mathrm{MRV}_z^{\text{EUE}} \ +\ \mathrm{MRV}_z^{\text{reserve}} \ +\ \mathrm{MRV}_z^{\text{ramp}},
+\]
+where the components correspond to the three expectation terms in \eqref{eq:H_grad}. In particular, even when $\E[\mathrm{EUE}]=0$, the last two terms can be positive if flexibility scarcities bind.
+\end{proposition}
+
+\begin{proof}
+Differentiate the LP value using the envelope theorem: each RHS parameter that increases feasible set reduces cost with marginal value equal to its optimal dual. The dependable MW raises zonal caps and (by construction) relaxes reserve and ramp budgets via calibrated derivatives; sum of dual-weighted derivatives gives the gradient. High-VOLL assures EUE reduction dominates whenever shedding occurs, recovering the Annex~F identity as a special case. 
+\end{proof}
+
+\paragraph{Calibration note.}
+Set $\lambda^{\mathrm{res}}$ to a conservative scarcity adder (e.g., \SI{1000}{\$/MWh}) or to a historical percentile of reserve shortage prices. Choose $G^{\uparrow},G^{\downarrow}$ from observed net-load ramps (P90) to avoid spurious scarcity.
+
+\subsection{ Audit and reporting}
+We report $(\sigma_z,\phi^{\uparrow}_z,\phi^{\downarrow}_z)$ histograms, binding frequencies, and the triplet $(\mathrm{MRV}^{\text{EUE}},\mathrm{MRV}^{\text{reserve}},\mathrm{MRV}^{\text{ramp}})$ by season—ensuring stakeholders can see \emph{what} drives MRV when EUE is negligible.
+
+% ========================================================
+\section{Annex  — Coarse Transmission Co-Optimization}
+\label{annex:Coarse_Transmission}
+
+\subsection{ State augmentation and investment delays}
+Extend the state with line capacities and build delays:
+\[
+s_t=\big(q^{\mathrm{dep}}_{t,k,z},\ \mathrm{TxCap}_{t,\ell},\ \mathrm{SOC}_{t},\ \underbrace{\eta_{t,\ell}^{(1:L_\ell)}}_{\text{pipeline of under-construction increments}}\big),
+\]
+where $\eta^{(\tau)}_{t,\ell}$ is capacity scheduled to come online in $\tau$ years; $L_\ell$ is the lead-time.
+
+\subsection{ Master decision and cost}
+Annual decision $x_t$ includes $\Delta \eta_{t,\ell}^{(L_\ell)}\ge 0$ and the recursions
+\[
+\eta_{t+1,\ell}^{(\tau-1)}=\eta_{t,\ell}^{(\tau)}\ \ (\tau\ge 2),\qquad
+\mathrm{TxCap}_{t+1,\ell}=\mathrm{TxCap}_{t,\ell}+\eta_{t,\ell}^{(1)}.
+\]
+Investment cost is convex: $\mathrm{CapEx}^{\mathrm{Tx}}_{t}=\sum_{\ell} C_\ell(\Delta \eta_{t,\ell}^{(L_\ell)})$.
+
+\subsection{ Recourse sensitivity and Benders cuts}
+In the DC SC-OPF recourse, $\mathrm{TxCap}_\ell$ appears in $|f_\ell|\le \overline f_\ell=\alpha_\ell \,\mathrm{TxCap}_\ell$ (with design factor $\alpha_\ell$). Let $\mu_\ell^{+},\mu_\ell^{-}\ge 0$ be the duals on the flow limits. The value-function subgradient in $\mathrm{TxCap}_\ell$ is
+\[
+\beta_{t,\ell}^{\mathrm{Tx}} \ =\ -\,\E\!\big[(\mu_\ell^{+}+\mu_\ell^{-})\,\alpha_\ell\big],
+\]
+and the Benders cut at a visited state $\bar s_t$ with decision $\bar x_t$ reads:
+\[
+V_t(s) \ \ge\ \alpha_t + \sum_{\ell}\beta_{t,\ell}^{\mathrm{Tx}}\,(\mathrm{TxCap}_{\ell}-\overline{\mathrm{TxCap}}_{\ell}) + \cdots,
+\]
+where $\alpha_t$ is the intercept and “$\cdots$” contains other state components’ subgradients (Annex~F).
+
+\begin{proposition}[Cut correctness with delays]
+With the pipeline dynamics and convex $C_\ell$, the SDDP backward pass using the above $\beta_{t,\ell}^{\mathrm{Tx}}$ yields valid cuts provided the state transition is affine. The delay is handled in the state mapping and does not affect linearity of the recourse dependence on $\mathrm{TxCap}$.
+\end{proposition}
+
+\begin{proof}
+The dependence of the recourse LP on $\mathrm{TxCap}$ is affine through bounds. Delays change only the transition $s_{t+1}=f(s_t,x_t)$, not the recourse parametrization. Hence the envelope derivative gives a valid subgradient; convexity of the value function follows as in Annex~F. 
+\end{proof}
+
+\subsection{ Deliverability update}
+Deliverability $D(b)$ depends on headroom $H_\ell=\overline f_\ell-|f^0_\ell|$. When $\mathrm{TxCap}_\ell$ changes, recompute $\overline f_\ell$ and $D(b)$. For reporting, we show $\partial D/\partial \mathrm{TxCap}_\ell$ via finite perturbations (small $\delta$) and include a sensitivity panel to highlight \emph{which} upgrades most improve $D$.
+
+
+\section{Annex I - Seasonal ELCC Estimation and LOLE/EUE Calibration}
+\label{annex:I}
+
+\subsection{ Problem definition and notation}
+Let $s\in\mathcal{S}$ index seasons, $z\in\mathcal{Z}$ zones, and $k\in\mathcal{K}$ resource classes.
+Write $L_{t,h}^{(s)}$ for load at hour $h$ in season $s$ for weather-year $t$, and $X_{t,h}^{(s,k)}$ for the stochastic output of resource $k$ (normalized to nameplate). For a portfolio vector $q_{z}^{\text{name}} = (q^{\text{name}}_{k,z})_k$ (nameplate MW by class), define net load
+\[
+N_{t,h}^{(s)}(q) \;=\; L_{t,h}^{(s)} - \sum_{k} X_{t,h}^{(s,k)}\,q^{\text{name}}_{k,z}\,.
+\]
+Fix a planning risk target $\mathrm{PRM}_s$ and a reference loss metric $\mathrm{LOLE}^{\star}_s$ (or $\mathrm{EUE}^{\star}_s$). The \emph{seasonal ELCC} of class $k$ at zone $z$ is the $m$ (MW) that solves
+\begin{equation}
+  \mathrm{Risk}\!\big(N_{t,h}^{(s)}(q + m e_k)\big)
+  \;=\; \mathrm{Risk}\!\big(N_{t,h}^{(s)}(q) - \Delta L\big), 
+  \qquad \text{with }\Delta L = m\,,
+  \label{eq:J_ELCC_def}
+\end{equation}
+where $\mathrm{Risk}(\cdot)$ is either seasonal $\mathrm{LOLE}$ (expected days/year with shed) or $\mathrm{EUE}$ (MWh/year shed). The \emph{ELCC fraction} is $\mathrm{ELCC}_{k,z,s} := m/q_{k,z}^{\text{name}}\in[0,1]$.
+
+\subsection{ Estimator with weather bootstraps}
+Given $T$ weather-years (historical or synthetic), compute risk via empirical average:
+\[
+\widehat{\mathrm{LOLE}}_s(q) \;=\; \frac{1}{T}\sum_{t=1}^{T}\!\sum_{h\in\mathcal{H}_s}
+\mathbf{1}\!\left\{ N_{t,h}^{(s)}(q) > \overline{G}^{(s)} \right\}\cdot w_h,\quad
+\widehat{\mathrm{EUE}}_s(q) \;=\; \frac{1}{T}\sum_{t,h}\!\big(N_{t,h}^{(s)}(q)-\overline{G}^{(s)}\big)_{+}\, w_h,
+\]
+with $\overline{G}^{(s)}$ the dependable supply threshold (post-FOR derates) and $w_h$ hour weights.
+Estimate $\mathrm{ELCC}_{k,z,s}$ by solving \eqref{eq:J_ELCC_def} with a 1D root finder (monotone in $m$).
+
+\paragraph{Bootstrap confidence.}
+Resample weather-years $t$ with replacement $B$ times; compute $\widehat{\mathrm{ELCC}}^{(b)}_{k,z,s}$ to obtain percentile bands (P10/P50/P90). Publish $\widehat{\mathrm{ELCC}}_{k,z,s}$ with $(\text{P10},\text{P90})$.
+
+\subsection{ Hybrids and saturation}
+For PV+Storage hybrids, let $q^{\text{name}}_{\mathrm{PV}}$, $q^{\text{name}}_{\mathrm{ST}}$, storage efficiency $\eta$, power limit $P_{\max}$, energy $E_{\max}$. Dispatch $X^{(s,\mathrm{hyb})}$ solves
+\[
+\max_{c,d,\mathrm{SOC}} \sum_{h} \lambda_h \big(X^{\mathrm{PV}}_{h} + d_h - c_h\big) 
+\quad\text{s.t.}\quad
+0\le d_h\le P_{\max},\ 0\le c_h\le P_{\max},\ 
+\mathrm{SOC}_{h+1}=\mathrm{SOC}_h + \eta c_h - d_h,\ 0\le \mathrm{SOC}\le E_{\max}.
+\]
+Insert the hybrid net output into $N_{t,h}^{(s)}(\cdot)$ and run the same risk mapping. Enforce the \emph{uplift cap} $\mathrm{ELCC}_{\mathrm{PV+St},s}\le 1.0$.
+
+\subsection{ Consistency with deliverability}
+Deliverability enters accreditation as $q_{k,z}^{\mathrm{dep}}=\mathrm{ELCC}_{k,z,s}\,D^{\mathrm{POI}}_{z}\,q^{\text{name}}_{k,z}$. All RA checks in Annex~F use $\sum_{k}q^{\mathrm{dep}}_{k,z}$, not nameplate.
+
+\subsection{ Acceptance tests}
+(i) Monotonicity: $\widehat{\mathrm{ELCC}}$ nondecreasing in $q^{\text{name}}$ at small increments; 
+(ii) Weather robustness: bootstrap width $\le$ configured band; 
+(iii) Cross-metric: LOLE/EUE consistent within tolerance (document if not).
+
+% =======================================================
+\section{Annex  — Storage Arbitrage and Ancillary Services (AS) Integration}
+\label{annex:K}
+
+\subsection{Arbitrage uplift \texorpdfstring{$\kappa(h,s)$}{kappa(h,s)} from DA/RT spreads}
+Let $p^{\mathrm{DA}}_{h,s}$ and $p^{\mathrm{RT}}_{h,s}$ be day-ahead and real-time prices. Define the empirical arbitrage uplift (per MWh of storage energy) as
+\[
+\kappa(h,s) \;=\; \E\!\left[\,(p^{\mathrm{RT}}_{h,s}-p^{\mathrm{DA}}_{h,s})_{+}\,\right]\cdot \eta,
+\]
+estimated over a rolling window; publish quantiles by hour/season. In ASCDE and market value, credit storage energy with $\kappa$ in addition to DA value.
+
+\subsection{ AS co-optimization (linear proxy)}
+Add AS variables for regulation ($r$), spinning ($y$), and supplemental ($u$) with zonal minimums $R^{\min},Y^{\min},U^{\min}$ and MCPs $\pi^{\mathrm{reg}},\pi^{\mathrm{spin}},\pi^{\mathrm{sup}}$:
+\begin{align*}
+\max_{g,c,d,r,y,u}\;& \sum_{i} \big(\lambda_h g_i\big) + \pi^{\mathrm{reg}} r + \pi^{\mathrm{spin}} y + \pi^{\mathrm{sup}} u
+\quad \text{s.t.}\quad 
+\text{(power balance, line limits),}\\
+& 0\le d\le P_{\max},\ 0\le c\le P_{\max},\ \mathrm{SOC}_{h+1}=\mathrm{SOC}_h+\eta c-d, \\
+& r+y+u \;\le\; P_{\max}-d,\qquad r\ge R^{\min},\ y\ge Y^{\min},\ u\ge U^{\min}.
+\end{align*}
+This preserves LP convexity; storage capacity contributes to energy and AS simultaneously up to power limit.
+
+\subsection{ Recourse integration and subgradients}
+In the Annex~F recourse LP, the AS constraints add duals $(\rho^{\mathrm{reg}},\rho^{\mathrm{spin}},\rho^{\mathrm{sup}})$ and a storage power-limit dual $\psi$. The value sensitivity to dependable capacity in zone $z$ becomes
+\[
+-\frac{\partial \E[Q]}{\partial q^{\mathrm{dep}}_{z}} 
+= \E[\pi_{z}A_{z}] \;+\; \underbrace{\E[\psi\cdot\partial P_{\max}/\partial q^{\mathrm{dep}}_{z}]}_{\text{energy/AS headroom}}
+\;+\; \E\!\big[\rho^{\mathrm{reg}} \tfrac{\partial R^{\min}}{\partial q^{\mathrm{dep}}_{z}} + \rho^{\mathrm{spin}} \tfrac{\partial Y^{\min}}{\partial q^{\mathrm{dep}}_{z}} + \rho^{\mathrm{sup}} \tfrac{\partial U^{\min}}{\partial q^{\mathrm{dep}}_{z}}\big].
+\]
+Thus MRV decomposes into EUE relief and flexibility/AS relief, analogous to Annex~H.
+
+\subsection{ Reporting}
+Publish hourly/seasonal $\kappa$ tables, AS MCP quantiles, and a panel decomposing MRV into $\{\text{EUE},\ \text{energy headroom},\ \text{AS minima}\}$ components.
+
+% ========================================================
+\section{Annex  — Two-Subregion PRA Toy Model (Worked Example)}
+\label{annex:L}
+
+\subsection{ Setup}
+Two zones $A,B$, linear inverse demands $p^D_A(\cdot),p^D_B(\cdot)$ with inelastic base (dead-band) near $d_A,d_B$; linear marginal costs for generation $p^S_A(g_A)=a_A+b_A g_A$, $p^S_B(g_B)=a_B+b_B g_B$. A tie-line with limit $F\ge 0$ from $A\to B$ (positive flow $f$ means export $A\to B$). Ignore losses. 
+
+\subsection{ Case (i): Deliverability-conditioned \emph{system} curve}
+Aggregate supply subject to $|f|\le F$ and nodal power balance:
+\[
+g_A - d_A - f = 0,\qquad g_B - d_B + f = 0,\qquad |f|\le F.
+\]
+The welfare-maximizing Lagrangian introduces system price $\lambda$ and transfer shadow $\nu^{+},\nu^{-}\ge 0$:
+\[
+\mathcal{L}=\sum_{Z\in\{A,B\}}\Big[\int_0^{d_Z} p^D_Z(x)\,dx-\int_0^{g_Z}p^S_Z(x)\,dx\Big] + \lambda\big[(g_A+g_B)-(d_A+d_B)\big] + \nu^{+}(F-f)+\nu^{-}(F+f).
+\]
+KKT yields
+\[
+p^S_A(g_A)=\lambda,\quad p^S_B(g_B)=\lambda,\quad \nu^{+}\cdot(F-f)=0,\ \ \nu^{-}\cdot(F+f)=0,\ \ \nu^{+},\nu^{-}\ge 0.
+\]
+Hence either (a) $|f|<F$ and $\nu^{\pm}=0$ $\Rightarrow$ one \emph{system} price $\lambda$ equalizes marginal costs; or (b) $|f|=F$ and $\lambda$ lies between the two marginal costs with the gap equal to the active $\nu$.
+
+\paragraph{Closed form with linear costs.}
+If $|f|<F$, then $a_A+b_A g_A = a_B + b_B g_B = \lambda$ and $g_A+g_B=d_A+d_B$. Solve the two equations for $(g_A,g_B)$ and compute $\lambda$; else bind $f=\pm F$ and solve $g_A=d_A\pm F$, $g_B=d_B\mp F$, then set $\lambda$ to the \emph{common} price only if $a_A+b_A g_A = a_B + b_B g_B$; otherwise price separation equals $\nu$.
+
+\subsection{ Case (ii): Subregional-only clearing with system shadow}
+Each zone clears independently with its own price $\lambda_A,\lambda_B$ given by $p^S_Z(g_Z)=\lambda_Z$, subject to $|f|\le F$ and balance $g_A-d_A-f=0$, $g_B-d_B+f=0$. The tie-line is used to minimize the \emph{sum of subregional costs}; the KKT give:
+\[
+\lambda_B - \lambda_A = 
+\begin{cases}
+\nu^{+} & \text{if } f=F,\\
+-\nu^{-} & \text{if } f=-F,\\
+0 & \text{if } |f|<F.
+\end{cases}
+\]
+Thus the \emph{system shadow value} is precisely the \emph{price separation}. 
+
+\paragraph{Implication.}
+Our PRA remedies: (a) \emph{deliverability-conditioned system curve} replicates Case (i), avoiding copper-plate overcount; (b) \emph{subregional-only with system shadow} accepts zonal pricing but makes the transfer shadow explicit. Both are consistent with the SDDP/OPF welfare model.
+
+\subsection{ Numerical illustration (parameterized)}
+Let $a_A=10$, $b_A=0.02$, $a_B=20$, $b_B=0.01$, $(d_A,d_B)=(1000,1000)$, $F=200$. 
+\begin{itemize}[leftmargin=1.2em]
+\item If $F\to\infty$ (copper plate), solve $10+0.02 g_A = 20+0.01 g_B$ with $g_A+g_B=2000$; obtain $(g_A,g_B)=(\num{666.7},\num{1333.3})$ and $\lambda=\$23.33$/MWh.
+\item With $F=200$, compute the unconstrained $f^\star=(g_A-d_A)= -333.3$ (import into $A$), which violates $|f|\le 200$; hence bind $f=-200$, set $g_A=800$, $g_B=1200$, prices $\lambda_A=10+0.02\cdot 800=\$26$, $\lambda_B=20+0.01\cdot 1200=\$32$, separation $\nu= \$6$/MWh.
+\end{itemize}
+This matches the KKT: transfer saturated, shadow equals price spread.
+
+% ========================================================
+\section{Annex — High-VOLL Diagnostics and Reporting}
+\label{annex:M}
+
+\subsection{ Test definition}
+The key identity $\mathrm{MRV}_z = -\partial \E[Q]/\partial q^{\mathrm{dep}}_{z}$ equals $\mathrm{VOLL}\cdot(-\partial \E[\mathrm{EUE}]/\partial q^{\mathrm{dep}}_{z})$ under \emph{high-VOLL}, i.e., marginal dependable MW first reduces shed $u$. We formalize a pass/fail test.
+
+\paragraph{Local perturbation protocol.}
+For each season and zone:
+\begin{enumerate}[leftmargin=1.2em]
+\item Solve the recourse OPFs on reduced scenarios; record $(u,g,f)$ and duals.
+\item Perturb $q^{\mathrm{dep}}_{z}\leftarrow q^{\mathrm{dep}}_{z}+\epsilon$ for small $\epsilon$ (e.g., \SI{1}{MW}); re-solve holding scenarios fixed.
+\item Evaluate $\Delta u$, $\Delta g$, $\Delta f$. Declare \textbf{pass} if $\Delta u/\epsilon \ge \theta$ with $\theta\in(0,1]$ (e.g., $\theta=0.5$) whenever scarcity is present; otherwise \textbf{flag}.
+\end{enumerate}
+
+\begin{lemma}[Diagnostic soundness]
+If \ $\Delta u/\epsilon \approx 0$ \ and \ $\sum_i |\Delta g_i|/\epsilon\gg 0$ systematically, the high-VOLL identity likely fails locally; report both $\E[\pi_z A_z]$ and $\mathrm{VOLL}\cdot(-\partial \E[\mathrm{EUE}]/\partial q^{\mathrm{dep}}_{z})$ as \emph{separate} MRV bands.
+\end{lemma}
+
+\subsection{ Reporting}
+We publish per (season, zone): pass/fail, $\widehat{\partial \E[Q] / \partial q^{\mathrm{dep}}_{z}}$, $\widehat{\partial \E[\mathrm{EUE}] / \partial q^{\mathrm{dep}}_{z}}$, and the dual-based $\E[\pi_z A_z]$. If UC-lite is active, include $\mathrm{MRV}^{\text{reserve}}$ and $\mathrm{MRV}^{\text{ramp}}$ (Annex~H).
+
+% ========================================================
+\section{Annex — Complexity, Parallel Scaling, and Hardware Capsule}
+\label{annex:N}
+
+\subsection{ OPF counts and wall-clock}
+Let $Y$ years, $S$ seasons, $D$ typical days/season, $H$ hours/day. Hours per year: $H_y=SDH$. With $M$ reduced scenarios and $P$ scenario paths per iteration, $I$ SDDP iterations:
+\[
+\text{OPFs} \approx I \cdot P \cdot H_y.
+\]
+Example: $(Y,S,D,H,M,P,I)=(30,4,12,24,100,15,7)\Rightarrow H_y=1152$, OPFs $\approx 120{,}960$.
+
+\subsection{ Parallel strategy}
+We use embarrassingly-parallel recourse solves across $(t,s,h,\omega)$ on $C$ cores; ideal wall-clock $\approx \text{OPFs}\times t_{\mathrm{OPF}}/C$. Communication is limited to cut aggregation per stage.
+
+\begin{proposition}[Amdahl-type bound]
+If fraction $\alpha$ of time is parallelizable (recourse) and $(1-\alpha)$ is serial (master/cut aggregation), speedup $S(C)\le 1/\big((1-\alpha)+\alpha/C\big)$. With $\alpha\ge 0.95$, $S(32)\gtrsim 18$ empirically.
+\end{proposition}
+
+\subsection{ Memory and numerics}
+LP memory scales with $O(N_{\text{bus}}+N_{\text{line}}+N_{\text{gen}})$ per OPF. Prefer sparse simplex or barrier with crossover off; tolerances in \texttt{solver.yml}. We log per-iteration cut counts and stale-cut aging to avoid numerical degradation.
+
+\subsection{ Reporting template}
+\begin{table}[h]
+\centering
+\caption{Annex — Performance Report (example)}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Stage} & \textbf{\#OPFs} & \textbf{Avg t/OPF (s)} & \textbf{Cores} & \textbf{Wall (h)} \\
+\midrule
+Annual (all seasons) & 120{,}960 & 0.45 & 32 & 1.70 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ========================================================
+\section{Annex  — Demand Elasticity Sensitivity}
+\label{annex:O}
+
+\subsection{ Elastic demand model}
+Replace inelastic $d_{n,h}$ with linear demand around $(\bar d_{n,h},\bar p_{n,h})$:
+\[
+p_{n,h}^{D}(q)=\bar p_{n,h} + \epsilon_{n,h}\,(q-\bar d_{n,h}),\qquad \epsilon_{n,h}\le 0.
+\]
+In the welfare objective, consumer surplus becomes explicit.
+
+\subsection{ Recourse modification and LMPs}
+The nodal balance is unchanged, but KKT now gives LMPs equal to the intersection of supply and demand slopes; the OPF remains an LP if we keep $\epsilon$ piecewise-constant (or a small QP if quadratic).
+
+\begin{proposition}[MRV shift under elasticity]
+Let $\lambda_{n,h}(\epsilon)$ be the LMP with slope $\epsilon$. The marginal welfare value of dependable MW at zone $z$ becomes
+\[
+-\frac{\partial \E[Q]}{\partial q^{\mathrm{dep}}_{z}}(\epsilon) \ =\ \E[\pi_z A_z] \ -\ \E\Big[\sum_{n\in z}\Delta \lambda_{n,h}(\epsilon)\cdot \frac{\partial d_{n,h}}{\partial \lambda_{n,h}}\cdot \frac{\partial \lambda_{n,h}}{\partial q^{\mathrm{dep}}_{z}}\Big],
+\]
+i.e., the MRV is reduced by local demand relief. For small $|\epsilon|$, the correction is $O(|\epsilon|)$; thus the inelastic model is a controlled approximation.
+\end{proposition}
+
+We adopt inelastic demand for the baseline welfare calculation,\footnote{A small-slope elastic demand sensitivity is reported in Annex~O, where we quantify the impact of $\epsilon<0$ on LMPs, consumer surplus, and $\mathrm{MRV}$.} so consumer surplus is constant and the problem reduces to minimizing expected total cost (OpEx + CapEx + $\VOLL\cdot\EUE$).
+
+\begin{proof}
+Differentiate welfare with respect to $q^{\mathrm{dep}}_{z}$ while accounting for the induced change in demand via $\epsilon$; linear response theory yields the second term. 
+\end{proof}
+
+\subsection{ Reporting}
+Publish MRV maps at $\epsilon\in\{0,-0.02\}$ and show the delta; include net benefit shifts in $\mathrm{Net}\$/\mathrm{RA\!-\!MW}$.
+
+% ========================================================
+\annexsection{Benchmark Replication Capsule}
+\label{annex:P}
+
+\subsection{Purpose}
+Provide a \emph{public, minimal} dataset and scripts that reproduce---to tight
+tolerances---(i) MRV maps, (ii) ASCDE panels, and (iii) the two-zone PRA example
+(Annex~L). The capsule enforces the determinism and QA targets in Annex~E.
+
+\subsection{CSV dialect \& encoding}
+All CSVs are RFC~4180 compliant, comma-delimited, with a single header row,
+UTF-8 encoding, and no BOM. Missing values are empty fields. Time indices, when
+present, are naive and interpreted in \texttt{America/Detroit}.
+
+\subsection{Dataset schema}
+We validate strict types and units. Tables~\ref{tab:P_buses}--\ref{tab:P_scen}
+are normative.
+
+\begin{table}[h]
+\centering
+\caption{Schema: \texttt{buses.csv}}
+\label{tab:P_buses}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{col} & \textbf{type} & \textbf{unit} & \textbf{domain} & \textbf{example} & \textbf{notes}\\
+\midrule
+bus\_id & string & -- & unique & B101 & primary key \\
+zone & string & -- & $\in\mathcal{Z}$ & Z\_A & joins MRV/ELCC \\
+lat, lon & float64 & deg & $[-90,90]\times[-180,180]$ & 42.3,\,-83.1 & optional (maps) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Schema: \texttt{lines.csv}}
+\label{tab:P_lines}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{col} & \textbf{type} & \textbf{unit} & \textbf{domain} & \textbf{example} & \textbf{notes}\\
+\midrule
+from\_bus,to\_bus & string & -- & $\in$ \texttt{buses.bus\_id} & B101,B207 & directed row \\
+fmax & float64 & MW & $>0$ & 500 & base-case thermal limit \\
+ptdf\_row & json & -- & vector $\in\R^{|\mathcal N|}$ & \{\dots\} & optional; else computed \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Schema: \texttt{gens.csv}}
+\label{tab:P_gens}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{col} & \textbf{type} & \textbf{unit} & \textbf{domain} & \textbf{example} & \textbf{notes}\\
+\midrule
+bus\_id & string & -- & $\in$ \texttt{buses.bus\_id} & B101 & placement \\
+tech & string & -- & $\in\{\text{CCGT, CT, Coal, PV, Wind, Storage}\}$ & PV & technology code \\
+a, b & float64 & \$/MWh & $\ge 0$ & 10,\;0.02 & linear cost $a+b\,g$ \\
+cap & float64 & MW & $\ge 0$ & 250 & nameplate \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Schema: \texttt{load.csv}}
+\label{tab:P_load}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{col} & \textbf{type} & \textbf{unit} & \textbf{domain} & \textbf{example} & \textbf{notes}\\
+\midrule
+bus\_id & string & -- & $\in$ \texttt{buses.bus\_id} & B101 &  \\
+season & string & -- & $\in\{\text{Win, Spr, Sum, Fal}\}$ & Sum &  \\
+hour & int32 & h & $1\ldots 24$ & 18 & typical-day index \\
+d & float64 & MW & $\ge 0$ & 145.7 & inelastic baseline \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Schema: \texttt{scenarios.csv}}
+\label{tab:P_scen}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{col} & \textbf{type} & \textbf{unit} & \textbf{domain} & \textbf{example} & \textbf{notes}\\
+\midrule
+season & string & -- & $\in\{\text{Win, Spr, Sum, Fal}\}$ & Sum & cluster key \\
+scen\_id & string & -- & unique per season & S\_Sum\_07 & reduced medoid \\
+weight & float64 & 1 & $(0,1]$ & 0.035 & $\sum w=1$ per season \\
+fuel & float64 & \$/MMBtu & $\ge 0$ & 3.25 & gas benchmark \\
+carbon & float64 & \$/t & $\ge 0$ & 50 & CO$_2$ price \\
+avail\_factor & json & -- & $A_{k,z}\in[0,1]$ & \{\dots\} & per tech/zone \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Constraints.}
+Joins must be exact; duplicates forbidden; all numeric fields validated for type and domain; any critical field (IDs, dates, MW, ELCC, EUE) $>\!1\%$ nulls or type errors $\Rightarrow$ \textbf{halt} (Annex~E rule).
+
+\subsection{Seeds, solvers, and determinism}
+We ship:
+\begin{itemize}[leftmargin=1.2em]
+\item \texttt{seeds.json}: \{\texttt{scenario\_seed}, \texttt{sddp\_seeds}[t], \texttt{lp\_tiebreak}\}.
+\item \texttt{solver.yml}: primal/dual feas $\le 10^{-7}$; opt gap $\le 5\times10^{-4}$ (annual cost units);
+      presolve=ON; crossover=OFF.
+\item \texttt{env\_hash.txt}: OS/compiler/BLAS/solver versions; code commit; dataset checksums.
+\end{itemize}
+Acceptance: two clean re-runs must match expected cost within $\pm 0.05\%$ and
+$\MRV_{z}$ (seasonal P50) within $\pm 1.0\%$ for all zones.
+
+\subsection{Reproduction steps}
+\begin{enumerate}[leftmargin=1.2em]
+\item \textbf{PTDF/LODF}: build seasonal AC baselines, export PTDF/LODF; compute $D(b)$ via headroom.
+      \emph{Guard:} $\varepsilon=10^{-6}$ in $D(b)=\min\{1,\min_\ell H_\ell/(|\Delta f_\ell|+\varepsilon)\}$.
+\item \textbf{Scenario reduction}: k-medoids by season with tail-weight constraints; record pre/post $W_1$.
+      Lipschitz constant $L$ is bounded by dual norms:
+      \[
+      \big|Q_t(\omega)-Q_t(\omega')\big|\le
+      L\,\|\omega-\omega'\|,
+      \qquad
+      L \le \sup_{y\in\mathcal{Y}}\big\|J^\top y\big\|_*,
+      \]
+      using $J$ for the $(A,b)$ Jacobian and $y$ optimal duals (empirical $\widehat L$ logged).
+\item \textbf{SDDP}: run DC SC-OPF recourse with seeds/tolerances; emit cut logs and holdout OOS check
+      (P50 $\le 3\%$, tail CVaR within band).
+\item \textbf{Outputs}: MRV maps, ASCDE panels, Annex~L price-spread ($\nu$) chart.
+\end{enumerate}
+
+\subsection{Files produced}
+\begin{lstlisting}[style=annexpseudo,caption={Artifacts emitted by the capsule},label={lst:annexP_artifacts}]
+annexP_data/          # input CSVs (schemas above)
+annexP_results/       # MRV maps, ASCDE tables, PRA toy outputs
+annexP_hashes.txt     # SHA256 checksums of inputs/outputs
+annexP_expected.json  # reference metrics and tolerances
+annexP_oos.csv        # holdout scenarios and out-of-sample errors
+\end{lstlisting}
+
+\subsection{Acceptance tests}
+\begin{itemize}[leftmargin=1.2em]
+\item Objective match $\le \pm 0.05\%$ across two runs with fixed seeds.
+\item $\MRV_{z}$ seasonal P50 within $\pm 1.0\%$ of \texttt{annexP\_expected.json}.
+\item Annex~L price spread $\nu$ within \SI{0.1}{\$/MWh}.
+\item Scenario audit: reported $W_1$ and tail weights satisfy configured caps; OOS P50 $\le 3\%$.
+\end{itemize}
+
+% =======================================================
+\section{Distributionally Robust SDDP (Wasserstein Ambiguity)}
+\label{annex:Wasserstein_Ambiguity}
+
+\subsection{ Motivation and ambiguity set}
+The expected-cost objective (Annex~F) is computed under an empirical law $\widehat{\mathbb{P}}$ (after reduction). To guard against misspecification, adopt the 1-Wasserstein ball
+\[
+\mathbb{B}_{\rho}\bigl(\widehat{\mathbb{P}}\bigr)
+\coloneqq
+\Bigl\{\,\mathbb{Q} : W_{1}\!\bigl(\mathbb{Q}, \widehat{\mathbb{P}}\bigr) \le \rho \Bigr\}.
+\]
+and solve the distributionally-robust program
+\[
+\min_{\pi}\ \sup_{\mathbb{Q}\in \mathbb{B}_{\rho}(\widehat{\mathbb{P}})}
+\ \mathbb{E}_{\omega\sim\mathbb{Q}}\!\Big[\mathrm{CapEx}(x)+Q(s,\omega)+\delta V(\cdot)\Big],
+\]
+so that performance holds for all scenario laws within distance $\rho$ of $\widehat{\mathbb{P}}$.
+
+\subsection{ Robust recourse bound and implementation}
+If LP recourse $Q_t(\cdot)$ is $L$-Lipschitz in $\omega$ (cf. Annex~E dual-norm bound),
+\[
+\sup_{\mathbb{Q}\in\mathbb{B}_\rho(\widehat{\mathbb{P}})}\ \mathbb{E}_{\mathbb{Q}}[Q_t(s,\omega)]
+\ \le\ \mathbb{E}_{\widehat{\mathbb{P}}}[Q_t(s,\omega)] + L\,\rho.
+\]
+Hence a safe robustification is obtained by adding $L\rho$ to each stage’s expected recourse. Let $\widehat L_t$ be the stage-wise estimate from OPF duals/Jacobians.
+
+\begin{proposition}[DRO intercept shift]
+The DRO objective is upper-bounded by
+\[
+\sum_{t=1}^{T}\delta^{t}\!\Big(\mathbb{E}_{\widehat{\mathbb{P}}}[Q_t]+\widehat L_t\rho\Big)
+\ +\ \sum_{t=1}^{T}\delta^{t}\mathrm{CapEx}_t,
+\]
+and is implementable by adding $+\widehat L_t\rho$ to each backward cut intercept $\alpha_t$; subgradients are unchanged.
+\end{proposition}
+
+\begin{proof}
+Kantorovich–Rubinstein duality gives $\sup_{\mathbb{Q}\in \mathbb{B}_\rho}\mathbb{E}_{\mathbb{Q}}[Q_t]
+\le \mathbb{E}_{\widehat{\mathbb{P}}}[Q_t] + L\rho$ for $L$-Lipschitz $Q_t$. Stage additivity yields the sum; the shift is a constant in $\alpha_t$.
+\end{proof}
+
+\subsection{OOS certificate and choosing \texorpdfstring{$\rho$}{rho}}
+
+With $N$ i.i.d. samples underlying $\widehat{\mathbb{P}}$, select $\rho(N,\alpha)$ from a concentration inequality so that $\mathbb{P}\in\mathbb{B}_\rho(\widehat{\mathbb{P}})$ w.p.\ $\ge 1-\alpha$. The computed DRO value then upper-bounds the true expected cost w.p.\ $\ge 1-\alpha$. Report $(\widehat L_t,\rho,\alpha)$ when executing the protocol.
+
+\paragraph{Computation (pseudocode).}
+\begin{lstlisting}[style=annexpseudo,caption={Quantum-inspired regime reweighting},label={lst:qsd}]
+for t = 1..T:
+  # regime weights with action penalty
+  compute weights: $w_t(r) \propto \exp(-\gamma\, \mathcal{A}(r \to r_{t+1}))$
+  # sample scenario from regime-mixture law
+  sample $\omega_t$ ~ mixture $\sum_{r} w_t(r)\, P(\,\cdot\,|\,r)$
+  # OPF recourse and dual capture
+  solve OPF recourse; record duals $(\pi_{z},\, \mu_{\ell},\, \nu)$
+  # cost functional with CVaR and state-coherence term
+  update cost: $J_s = \mathrm{CVaR}_{\alpha}[\mathrm{EUE}_s] + \alpha_0 \cdot \Delta_{\text{state},s}$
+# backward pass: add cuts from duals
+backward: add cuts using usual $\beta$ from duals; intercept includes $\Delta_{\text{state}}$ penalty
+\end{lstlisting}
+
+\paragraph{Execution note.} This annex defines a method; no results are asserted until run.
+
+% =======================================================
+\annexsection{Bilevel PRA-Consistent Expansion (MPEC/KKT Reduction)}
+\label{annex:Q}
+
+\subsection{ Upper–lower structure}
+Upper level chooses $x_t$ to minimize discounted cost; lower level clears a zonal DC SC-OPF (subregional-only with transfer caps):
+\[
+\min_{x}\ \sum_t \delta^{t}\!\big(\mathrm{CapEx}_t(x_t) + \mathbb{E}[Q_t(s_t,\omega)]\big)
+\quad\text{s.t.}\quad s_{t+1}=f(s_t,x_t),\ \ (g,f,\theta,u)\in\arg\min\mathrm{LL}(s_t,\omega).
+\]
+
+\subsection{ LL KKT and single-level form}
+Let $\lambda$ be nodal duals, $\mu_\ell^{\pm}$ line-limit duals, $\nu^{\pm}$ intertie duals. KKT imply
+\[
+p_i^{S}{}'(g_i)=\lambda_{n(i)}-\text{(unit-constraint duals)},\qquad
+\lambda_B-\lambda_A=\nu^{+}\mathbf{1}_{(f=F)}-\nu^{-}\mathbf{1}_{(f=-F)}.
+\]
+Embedding KKT + complementarity yields an MPEC equivalent to the bilevel.
+
+\begin{proposition}[Price–shadow identity]
+If the intertie binds in subregional-only clearing, the system shadow equals the price spread: $\lambda_B-\lambda_A=\nu$.
+\end{proposition}
+
+\begin{proposition}[UL gradient via LL duals (envelope)]
+For feasible $(s_t,x_t)$,
+\(
+-\,\partial \mathbb{E}[Q_t]/\partial q^{\mathrm{dep}}_{z} = \mathbb{E}[\pi_z A_z],
+\)
+and under high-\VOLL{} this equals $\MRV_z$ (Annex~F).
+\end{proposition}
+
+\paragraph{Protocol note.} Complementarity can be handled by big-$M$, SOS1, or penalty smoothing; identities above are structural and solver-agnostic.
+
+% =======================================================
+\annexsection{Cut Management, Convergence, and Sample Complexity}
+\label{annex:R}
+
+\subsection{\texorpdfstring{$\varepsilon$}{epsilon}-dominance pruning with value convergence}
+Maintain per-stage cut sets $\mathcal{C}_t$. A cut $(\alpha,\beta)$ is $\varepsilon$-dominated if
+\[
+\alpha+\langle\beta,s\rangle \ \le\ \max_{(\alpha',\beta')\in\mathcal{C}_t}\{\alpha'+\langle\beta',s\rangle\}-\varepsilon
+\]
+for all visited $s$; prune such cuts every $K$ iterations.
+
+\begin{theorem}[Convergence to $\varepsilon$-optimal value]
+With compact state sets and bounded subgradients $\|\beta\|\le B$, SDDP with $\varepsilon$-dominance pruning converges in value to within $\varepsilon$ of the true stage value uniformly on the visited set.
+\end{theorem}
+
+\begin{proof}
+Piecewise-linear under-estimators with bounded slopes yield a monotone, equicontinuous sequence; pruning removes only cuts that lower the pointwise max by at most $\varepsilon$. Standard SDDP supermartingale arguments complete the proof.
+\end{proof}
+
+\subsection{ MRV sample complexity (precision dial)}
+For $\widehat{\mathrm{MRV}}_z=\frac{1}{N}\sum_{i=1}^N Y_i$, $Y_i=\pi_{z}(\omega_i)A_{z}(\omega_i)\in[0,M]$,
+\[
+\Pr\!\Big(\big|\widehat{\mathrm{MRV}}_z-\mathbb{E}[Y]\big|>\eta\Big)\ \le\ 2\exp\!\Big(-\tfrac{2N\eta^2}{M^2}\Big).
+\]
+Thus $N \ge \frac{M^2}{2\eta^2}\log\frac{2}{\alpha}$ suffices for $\pm\eta$ accuracy with prob.\ $\ge 1-\alpha$ (use a union bound across zones/seasons).
+
+\subsection{ Practical schedule (protocol)}
+Prune with $\varepsilon=10^{-4}$ (annual-cost units) every $K=2$ iterations; cap per-stage cuts at 2,000 with FIFO aging; stop when the forward/backward gap $\le 0.5\%$ and three consecutive iterations change $V_t$ by $<0.1\%$ (Annex~E).
+
+% =======================================================
+\annexsection{Minimal Large-Scale Pilot (Compute \& Data) — Protocol}
+\label{annex:S}
+
+\subsection{Footprint (proposed)}
+Nodes $|\mathcal N|=500$; lines $|\mathcal L|=650$; gens $|\mathcal G|=900$.
+Horizon $T=30$; seasons $S=4$; typical days $D=12$ (1,152 h/y).
+Reduced scenarios $M=80$; SDDP paths/iter $P=12$; iterations $I=8$.
+
+\subsection{ Compute budget (estimate)}
+OPFs $\approx I\cdot P\cdot 1{,}152 = 110{,}592$; average solve time $0.5$ s;
+on 32 cores, wall $\approx 0.48$ h (parallel recourse). Memory $\le 16$ GB with sparse simplex/barrier (crossover OFF).
+
+\subsection{Execution and acceptance (when run)}
+Upon execution, publish MRV/\ASCDE{} with P10/P50/P90, the PRA toy validation, DRO penalty share, cut/pruning logs, and OOS P50 $\le 3\%$. Until run, this annex remains a protocol only.
+
+\annexsection{Empirical Validation \& Scalability --- Protocol (Results-Free)}
+\label{annex:T}
+
+\subsection{Objective and scope}
+This annex specifies a \emph{protocol} to validate fixes (A/B), MRV/\ASCDE{}, and ARQ rankings against historical PRA-aligned data at ISO scale. No results are asserted here. Execution artifacts and acceptance thresholds are defined so that, when run, evidence is sufficient for regulatory and academic review.
+
+\subsection{Datasets and alignment (to provide at run time)}
+\begin{enumerate}[leftmargin=1.2em]
+  \item \textbf{Historical operations:} hourly load/net-load, unit outages/FOR, fuel/carbon benchmarks (year-aligned to PRA windows).
+  \item \textbf{Accreditation:} seasonal \ELCC{} tables by class/zone consistent with Annex~J.
+  \item \textbf{Network:} seasonal AC baselines $\to$ PTDF/LODF exports; deliverability $D(b)$ with guard $\varepsilon=10^{-6}$.
+  \item \textbf{Market frame:} PRA parameters (PRM, scarcity adders), zonal intertie caps, and any backstop mechanisms.
+\end{enumerate}
+
+\subsection{Validation design}
+We test three questions:
+\begin{description}[leftmargin=1.2em,labelsep=0.5em]
+  \item[Q1 (Reliability):] Do fixes A/B reduce \EUE{}/\LOLE{} relative to baseline PRA counting?
+  \item[Q2 (Economic):] Do MRV-guided additions ($\MC \le \MRV$) improve Net~\$/RA\text{-}MW?
+  \item[Q3 (Ranking):] Is ARQ ordering stable out-of-sample (holdout weather/fuel) and under deliverability shocks ($D$ stressed downward)?
+\end{description}
+
+\subsection{Monte Carlo protocol (ISO scale; no unit commitment)}
+Let $\{\omega_i\}_{i=1}^{N}$ be reduced scenarios (Annex~E). For each $(\omega_i,s)$:
+\begin{enumerate}[leftmargin=1.2em]
+  \item Solve DC SC-OPF recourse with Annex~F constraints (and optional UC-lite, Annex~H).
+  \item Record $u$ (shed), LMPs, binding sets, duals $(\pi_z,\mu_\ell,\nu)$.
+  \item Compute $\mathrm{EUE}_{z,s}(\omega_i)$ and $\widehat{\mathrm{MRV}}_{z,s}(\omega_i)=\pi_{z,s}A_{z,s}$, with component attributions (reserve/ramp if UC-lite).
+\end{enumerate}
+Aggregate by season to obtain P10/P50/P90 for $\{\mathrm{EUE},\mathrm{LOLE},\mathrm{MRV},\mathrm{Net}\$/\mathrm{RA\text{-}MW}\}$.
+
+\subsection{Statistical reporting (upon execution)}
+\begin{align}
+\mathrm{CI}_{95\%}\big(\mathrm{MRV}_{z,s}\big) &= \widehat m \pm 1.96\,\widehat\sigma/\sqrt{N},\\
+N(\eta,\alpha) &\ge \frac{M^2}{2\eta^2}\,\log\!\frac{2}{\alpha}\quad \text{(Hoeffding; see Annex~S)}.
+\end{align}
+Acceptance (when run): \LOLE{} decreases or \EUE{} decreases vs.\ baseline; $\Delta(\mathrm{Net}\$/\mathrm{RA\text{-}MW}) \ge 0$; Kendall $\tau \ge 0.6$ for ARQ stability on holdout.
+
+\subsection{External simulators (optional)}
+If PLEXOS or SERVM is used as a cross-check, align inputs and compare \emph{only} reliability/economic aggregates (\EUE{}, \LOLE{}, scarcity hours, Net~\$/RA\text{-}MW). Keep MRV/dual objects within the Annex~F engine for interpretability.
+
+\subsection{Artifacts and determinism (to be emitted when run)}
+\texttt{t\_log.csv} (scenario, season, EUE/LOLE, MRV components), \texttt{t\_cuts.csv} (cuts by stage), \texttt{t\_oos.csv} (holdout errors), \texttt{seeds.json}, \texttt{solver.yml}, \texttt{env\_hash.txt}. Two clean re-runs must meet Annex~E tolerances.
+
+\newpage
+
+\subsection*{Concluding Annex Statement: Protocol Scope, Provenance, and Non-Assertion of Results}
+
+\noindent\textbf{Scope.}
+This manuscript is methods-first and results-free. All numerical values, figures, tables, maps, and files referenced in Annexes O–T are \emph{to be generated upon execution} of the protocols described therein. No empirical result is asserted in this version.
+
+\medskip
+\noindent\textbf{What is asserted.}
+Theoretical constructs (e.g., welfare objective, deliverability definition, MRV identities under stated assumptions, KKT price–shadow identity, SDDP/DRO bounds, convergence and sample-complexity theorems) are asserted as mathematics. Any empirical statements are conditional and become claims only after the execution artifacts listed below are produced and validated.
+
+\medskip
+\noindent\textbf{Execution gating and acceptance tests.}
+Results are created only when the benchmark and validation protocols are run (Annex O and Annex T). Acceptance thresholds to be checked at run time include, at minimum (see Annex E for full targets):
+\begin{itemize}[leftmargin=1.2em]
+  \item Expected-cost match across two seeded runs: $\le \pm 0.05\%$.
+  \item MRV P50 error (all zones/seasons): $\le \pm 1.0\%$.
+  \item Out-of-sample recourse error (holdout): P50 $\le 3\%$ (tails within configured CVaR bands).
+\end{itemize}
+
+\medskip
+\noindent\textbf{Provenance and determinism (to be emitted when run).}
+At execution time the pipeline writes the following, which serve as the provenance record:
+\begin{itemize}[leftmargin=1.2em]
+  \item \texttt{manifest.yml} (file list, schema contracts, timezone, currency year, SHA-256 checksums).
+  \item \texttt{seeds.json} (scenario seeds, SDDP stage seeds, LP tie-break settings).
+  \item \texttt{solver.yml} (primal/dual tolerances, optimality gap target, presolve/crossover settings).
+  \item \texttt{env\_hash.txt} (OS, compiler/BLAS, solver versions, code commit).
+  \item Protocol-specific logs and outputs (e.g., \texttt{annexO\_oos.csv}, \texttt{annexE\_cuts.csv}, \texttt{t\_log.csv}); filenames are placeholders until execution.
+\end{itemize}
+No prior artifacts are claimed to exist before execution; all checksums are computed at run time.
+
+\medskip
+\noindent\textbf{Language hygiene.}
+Throughout Annexes O–T, phrases such as “publish,” “produce,” or “emit” are to be read as
+“\emph{upon execution, publish/produce/emit}.” Any legacy phrasing implying completed
+outputs should be interpreted as protocol intent, not as an assertion of completed results.
+
+\medskip
+\noindent\textbf{Post-execution certification template.}
+Upon completing a run, paste the following block into this section and archive it with the artifacts:
+\begin{quote}\small
+\textbf{Execution certification.} Date/time (UTC): \underline{\hspace{3cm}}.\\
+Code commit: \underline{\hspace{5cm}}.  Seeds: \underline{\hspace{3cm}}.  Solver: \underline{\hspace{4cm}}.\\
+Dataset checksums (manifest): attached.\\
+Acceptance tests: cost reproducibility $\checkmark$ / $\times$; MRV P50 $\checkmark$ / $\times$; OOS P50 $\checkmark$ / $\times$; tails within bands $\checkmark$ / $\times$.\\
+Notes on deviations (if any): \underline{\hspace{8cm}}.
+\end{quote}
+
+\medskip
+\noindent\textbf{Contact and updates.}
+For questions about running the protocol or interpreting acceptance tests, contact the corresponding author listed on the title page. This section will be updated after each certified execution, and prior versions will be retained for auditability.
+
+\newpage
+
+% --------- Bibliography (placeholders) ---------
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+
+\bibitem[MISO PRA BPM(2025)]{MISO_BPM_PRA_2025}
+Midcontinent ISO (MISO), \emph{Planning Resource Auction Business Practice Manual}, 2025. [Add exact version and link].
+
+\bibitem[FERC(2023)]{FERC_Order_2023}
+Federal Energy Regulatory Commission, \emph{Order No. 2023 and Order No. 2023-A}, Docket Nos. RM22-14-000 et al., 2023--2024. [Add Federal Register citations].
+
+\bibitem[RA\_ELCC()]{ELCC_refs}
+Add your ISO ELCC and RA references here.
+
+\bibitem[OPF()]{OPF_refs}
+OPF references for AC baselines and DC linearizations (PTDF/LODF).
+
+\bibitem{Stoft2002}
+S. Stoft, \textit{Power System Economics}. IEEE Press/Wiley, 2002.
+
+\bibitem{KirschenStrbac2004}
+D. Kirschen and G. Strbac, \textit{Fundamentals of Power System Economics}. Wiley, 2004.
+
+\bibitem{WoodWollenberg2014}
+A. J. Wood, B. F. Wollenberg, and G. B. Sheble, \textit{Power Generation, Operation, and Control}, 3rd ed. Wiley, 2014.
+
+\bibitem{BillintonAllan1996}
+R. Billinton and R. N. Allan, \textit{Reliability Evaluation of Power Systems}, 2nd ed. Plenum, 1996.
+
+\bibitem{IEEE_RTS1999}
+IEEE Task Force, ``The IEEE Reliability Test System,'' \textit{IEEE Trans. Power Systems}, 1999.
+
+\bibitem{NERC_PA2018}
+NERC, \textit{Probabilistic Adequacy and Measures: Technical Reference Document}. North American Electric Reliability Corporation, 2018.A physics-consistent reliability valuation framework (UEVF/ASCDE) for MISO's Planning Resource Auction. Features AC-OPF baselines, SDDP-based valuation, and the ARQ interconnection sequencing protocol with strict reproducibility guarantees.
+
+\bibitem{MISO_SOM_2025}
+MISO, \textit{State of the Market Report 2025}, 2025.
+
+\bibitem{PJM_Manual18_2025}
+PJM, \textit{Manual 18: Capacity Market}, 2025.
+
+\bibitem{CAISO_LRA_2025}
+CAISO, \textit{2025 Summer Loads and Resources Assessment}, 2025.
+
+\bibitem{NREL_ATB_2025}
+NREL, \textit{Annual Technology Baseline 2025}, National Renewable Energy Laboratory, 2025.
+
+\bibitem{EIA_AEO_2025}
+EIA, \textit{Annual Energy Outlook 2025}, U.S. Energy Information Administration, 2025.
+
+\bibitem{RockafellarUryasev2000}
+R. T. Rockafellar and S. Uryasev, ``Optimization of Conditional Value-at-Risk,'' \textit{Journal of Risk}, 2000.
+
+\bibitem{BoydVandenberghe2004}
+S. Boyd and L. Vandenberghe, \textit{Convex Optimization}. Cambridge University Press, 2004.
+
+\end{thebibliography}
+
+\end{document}
+
